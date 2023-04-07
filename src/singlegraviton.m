@@ -36,6 +36,8 @@ TraceP[Xlist_] := Module[{prod,LL,ans},
 	ans
 ];
 
+(* create trace *)
+(*CreateWord[singleTrace_,NN_] :=Flatten[Table[Table[Table[X[index[Sequence@@UnitVector[5,k],i,j]],{i,1,NN},{j,1,NN}],singleTrace[[k]]],{k,1,5}],1];*)
 CreateWord[singleTrace_,NN_] := Flatten[Table[Table[Table[
 	If[i==j&&specialQ,
 		Which[NN==2&&i==1,
