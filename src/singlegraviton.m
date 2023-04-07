@@ -36,12 +36,32 @@ TraceP[Xlist_] := Module[{prod,LL,ans},
 	ans
 ];
 
-(* create trace *)
-(*CreateWord[singleTrace_] :=Table[Table[X@@UnitVector[5,i],singleTrace[[i]]],{i,1,5}]//Flatten
-LoadMatrix[NN_] := {X[a__]:>Table[XF[{a},{i,j}],{i,1,NN},{j,1,NN}]/;EvenQ[{a}[[3]]+{a}[[4]]+{a}[[5]]],
-	X[a__]:>Table[XB[{a},{i,j}],{i,1,NN},{j,1,NN}]/;OddQ[{a}[[3]]+{a}[[4]]+{a}[[5]]]};
-MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace]/.LoadMatrix[NN]]//GExpand);*)
-CreateWord[singleTrace_,NN_] :=Flatten[Table[Table[Table[X[index[Sequence@@UnitVector[5,k],i,j]],{i,1,NN},{j,1,NN}],singleTrace[[k]]],{k,1,5}],1];
+CreateWord[singleTrace_,NN_] := Flatten[Table[Table[Table[
+	If[i==j&&specialQ,
+		Which[NN==2&&i==1,
+			1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]],
+			NN==2&&i==2,
+			-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]],
+			NN==3&&i==1,
+			-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]]+1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]],
+			NN==3&&i==2,
+			1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]]+1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]],
+			NN==3&&i==3,
+			-Sqrt[2/3]X[index[Sequence@@UnitVector[5,k],2,2]],
+			NN==4&&i==1,
+			-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]]-1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+			NN==4&&i==2,
+			Sqrt[2/3]X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+			NN==4&&i==3,
+			1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]]-1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+			NN==4&&i==4,
+			-(Sqrt[3]/2)X[index[Sequence@@UnitVector[5,k],3,3]]
+			]
+		,
+		X[index[Sequence@@UnitVector[5,k],i,j]]
+	]
+,{i,1,NN},{j,1,NN}],singleTrace[[k]]],{k,1,5}],1];
+
 MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace,NN]]);
 PrepData[chargelist_,degree_,N_]:={#[[1]],MonoCharge[#[[2]],N]} &/@ TwoGroupsData[chargelist,degree];
 

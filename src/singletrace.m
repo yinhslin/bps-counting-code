@@ -139,9 +139,33 @@ Stuff[] := Module[{},
 		Tr[prod]
 	];
 
-	CreateWord[singleTrace_,NN_] := (Table[ X[index[#[[1]],#[[2]],#[[3]],#[[4]],#[[5]],i,j]] ,{i,1,NN},{j,1,NN}]) &/@ singleTrace;
-(*	CreateWord[singleTrace_] := (X@@#) &/@ singleTrace;
-	LoadMatrix[NN_] := X[a__]:>Table[XX[EvenQ[{a}[[3]]+{a}[[4]]+{a}[[5]]],a,i,j],{i,1,NN},{j,1,NN}];*)
+	(*CreateWord[singleTrace_,NN_] :=Flatten[Table[Table[Table[X[index[Sequence@@UnitVector[5,k],i,j]],{i,1,NN},{j,1,NN}],singleTrace[[k]]],{k,1,5}],1];*)
+	CreateWord[singleTrace_,NN_] := Flatten[Table[Table[Table[
+		If[i==j&&specialQ,
+			Which[NN==2&&i==1,
+				1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]],
+				NN==2&&i==2,
+				-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]],
+				NN==3&&i==1,
+				-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]]+1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]],
+				NN==3&&i==2,
+				1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]]+1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]],
+				NN==3&&i==3,
+				-Sqrt[2/3]X[index[Sequence@@UnitVector[5,k],2,2]],
+				NN==4&&i==1,
+				-(1/Sqrt[2])X[index[Sequence@@UnitVector[5,k],1,1]]-1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+				NN==4&&i==2,
+				Sqrt[2/3]X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+				NN==4&&i==3,
+				1/Sqrt[2] X[index[Sequence@@UnitVector[5,k],1,1]]-1/Sqrt[6] X[index[Sequence@@UnitVector[5,k],2,2]]+1/(2Sqrt[3]) X[index[Sequence@@UnitVector[5,k],3,3]],
+				NN==4&&i==4,
+				-(Sqrt[3]/2)X[index[Sequence@@UnitVector[5,k],3,3]]
+				]
+			,
+			X[index[Sequence@@UnitVector[5,k],i,j]]
+		]
+	,{i,1,NN},{j,1,NN}],singleTrace[[k]]],{k,1,5}],1];
+
 	MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace,NN]]//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand);
 
 ];
