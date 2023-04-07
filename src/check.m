@@ -35,9 +35,19 @@ If[perm === Null, perm = False, perm = True];
 delete = param["d"];
 If[delete === Null, delete = False, delete = True];
 
-directory = "/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>ToLowerCase[type]<>"/";
-(*directory = "/n/home07/yhlin/bps/"<>ToLowerCase[type]<>"/";*)
-(*directory = "/Users/yinhslin/Dropbox (Harvard University)/1:16 BPS revisited/math/singletrace/";*)
+user = $Username
+home = Switch[user,
+	"yhlin",
+		If[specialQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
+			,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
+		];
+	,
+	_,
+		Directory[]<>"/"
+];
+directory = home<>ToLowerCase[type]<>"/";
 
 
 (* ::Section:: *)

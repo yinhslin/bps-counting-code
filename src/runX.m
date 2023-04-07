@@ -39,22 +39,21 @@ numerical = param["n"] // ToExpression;
 If[numerical === Null, numerical = False, numerical = True];
 chunk = param["c"] // ToExpression;
 If[chunk === Null, chunk = 10^3];
-user = param["h"] // ToExpression;
-If[user === Null, user = "yhlin"];
+user = $Username
 
 
-If[user == "yhlin",
-	If[specialQ,
-		home = "/n/holyscratch01/yin_lab/Users/yhlin/bps/";
-		,
-		home = "/n/holyscratch01/yin_lab/Users/yhlin/bps_u/";
-	];
-,
-	home = "/Users/chang/Dropbox/projects/BPS states/1:16 BPS revisited/math/ying/v5/"
+home = Switch[user,
+	"yhlin",
+		If[specialQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
+			,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
+		];
+	,
+	_,
+		Directory[]<>"/"
 ];
-(*home = "/n/home07/yhlin/bps/";*)
-(*home = "/Users/chang/Dropbox/projects/BPS states/1:16 BPS revisited/math/ying/bps_new/";*)
-(*home = "/Users/yinhslin/Dropbox (Harvard University)/1:16 BPS revisited/math/";*)
+
 necklaceDirectory = home <> "necklace/";
 singleDirectory = home <> "singletrace/";
 multiDirectory = home <> "multitrace/";
