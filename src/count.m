@@ -106,7 +106,7 @@ Q[a_Times]:=Module[{alist,sign,A},
 	,{n,alist//Length}];
 	A
 ];
-Q[n_]:=0/;NumberQ[n];
+Q[n_]:=0/;NumericQ[n];
 Q[X[a_]^n_]:=n X[a]^(n-1)Q[X[a]]/;fp[a]==0;
 (*Q[X[a_]**b_]:=Q[X[a]]**b - X[a]**Q[b]/;fp[a]==1;*)
 Q[a_NonCommutativeMultiply]:=Module[{alist,sign,A},
@@ -188,7 +188,7 @@ Stuff[];
 (*Independence*)
 
 
-CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumberQ[n]}/.{-a_:>a}]],0];
+CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
 
 If[numerical,
 	julia = "julia";
@@ -224,7 +224,7 @@ If[numKernels === Null,
 ];
 
 (* CM *)
-UnTimes[n_,a__]:=n UnTimes[a]/;NumberQ[n];
+UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{{},{}},
