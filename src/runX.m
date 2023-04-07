@@ -39,9 +39,9 @@ numerical = param["n"] // ToExpression;
 If[numerical === Null, numerical = False, numerical = True];
 chunk = param["c"] // ToExpression;
 If[chunk === Null, chunk = 10^3];
-user = $Username
 
 
+user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
