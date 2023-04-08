@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Input*)
 
 
 options = $CommandLine;
-options = {"-N", "2", "-lmin", "4", "-lmax", "4"};
+options = {"-N", "3", "-lmin", "4", "-lmax", "4"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -110,6 +110,18 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 
 (* Inner product of monomials *)
 IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
+	l1=(m1/.NonCommutativeMultiply->Times/.Times->List)/.{X[n_]^p_:>Array[X[n]&,{p}]}//Flatten;
+	If[!ListQ[l1],l1={l1}];
+	l1=Table[If[ListQ[x],Array[(x[[1]])&,{x[[2]]}],x],{x,l1}]//Flatten;
+	l2=(m2/.NonCommutativeMultiply->Times/.Times->List)/.{X[n_]^p_:>Array[X[n]&,{p}]}//Flatten;
+	If[!ListQ[l2],l2={l2}];
+	l2=Table[If[ListQ[x],Array[(x[[1]])&,{x[[2]]}],x],{x,l2}]//Flatten;
+	t1=Tally[l1];
+	t2=Tally[l2];
+	If[t1=!=t2,Return[0]];
+	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
+];
+(*IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	l1=m1/.NonCommutativeMultiply->Times/.{Power->List,Times->List};
 	If[!ListQ[l1],l1={l1}];
 	l1=Table[If[ListQ[x],Array[(x[[1]])&,{x[[2]]}],x],{x,l1}]//Flatten;
@@ -120,7 +132,7 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	t2=Tally[l2];
 	If[t1=!=t2,Return[0]];
 	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
-];
+];*)
 
 (* Inner product of polynomials using 2-finger algorithm *)
 IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
@@ -128,6 +140,7 @@ IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
 	l1=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l1//Sort;
 	l2=p2/.Plus->List;
 	l2=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l2//Sort;
+	Print[l1];
 	ans = 0;
 	While[i<=Length[l1] && j<=Length[l2],
 		comp = Order[l1[[i]],l2[[j]]];
@@ -140,7 +153,18 @@ IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
 	ans
 ];
 
-(* T-matrix using 2-finger algorithm *)
+(* Valid for U(N) and SU(2) *)
+(* T-matrix for list of monomials using 2-finger algorithm *)
+TDiag[l_]:=Module[{ans},
+	ans=SparseArray[{},{Length[l],Length[l]}];
+	Do[
+		ans[[i,i]]=IPmono[l[[i]],l[[i]]]
+	,
+		{i,1,Length[l]}
+	];
+	ans
+];
+(* TO DEPRECIATE *)
 T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
 	(* sort l1, l2 *)
 	ord1 = Ordering[l1];
@@ -159,6 +183,42 @@ T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
 	ans
 ];
 
+(* (3.6-3.8) *)
+ChangeIJ[n_,i_,j_]:=2^4*Quotient[n,2^4]+(i-1)*2^2+(j-1);
+Sub[n_]:=Module[{i,j},
+	{i,j}={mati[n],matj[n]};
+	If[i==j,
+		Switch[NN,
+			3,
+				Switch[i,
+					1, -X[n]+X[ChangeIJ[n,2,2]],
+					2, X[n]+X[ChangeIJ[n,2,2]]
+				],
+			4,
+				Switch[i,
+					1, -X[n]-X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]],
+					2, 2X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]],
+					3, X[n]-X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]]
+				]
+		]
+	,
+		X[n]
+	]
+]/;NN>2;
+Sub[n_]:=X[n]/;NN==2;
+
+(* T-matrix for list of polynomials *)
+UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
+UnTimes[a_]:=a;
+T[l_]:=Module[{ll,allTerms,matrix},
+	ll=l/.X[n_]:>Sub[n]//Expand;
+	ll=ll/.Times->UnTimes;
+	allTerms = CollectTerms[ll];
+	matrix = CoefficientArrays[ll,allTerms][[2]];
+	allTerms = allTerms/.UnTimes->Times;
+	matrix . TDiag[allTerms] . Transpose[matrix]
+];
+
 
 (* ::Section:: *)
 (*Test *)
@@ -168,30 +228,54 @@ Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
 
 
 (* ::Subsection:: *)
+(*T matrix for non-diagonal product*)
+
+
+CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumberQ[n]}/.{-a_:>a}]],0];
+p=multiTrace[{0,0,0,0,3},3,NN];
+l=CollectTerms[Flatten[p]];
+
+
+l
+ll=l/.X[n_]:>Sub[n]//Expand
+T[l]//Normal//MatrixForm
+
+
+l[[1]]
+l[[1]]/.{X[n_]:>Sub[n]}//Expand
+
+
+Sub[16]
+decode[16]
+decode[21]
+
+
+(* ::Subsection:: *)
 (*T-matrix*)
 
 
 CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumberQ[n]}/.{-a_:>a}]],0];
-p=multiTrace[{0,0,1,1,2},4,2];
+p=multiTrace[{0,0,1,1,2},4,NN];
 l=CollectTerms[Flatten[p]];
 
 tmp1 = T[l,l]//Normal
 tmp2 = Table[IPmono[x,y],{x,l},{y,l}]
-tmp1==tmp2
+tmp3 = TDiag[l]//Normal
+tmp1==tmp2==tmp3
 
 
 (* ::Subsection:: *)
 (*Inner product*)
 
 
-p1=multiTrace[{1,1,0,0,0},2,2][[1]]
+p1=multiTrace[{1,1,0,0,0},2,NN][[1]]
 l1=p1/.Plus->List;
 l1=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l1//Sort
 
-p2=multiTrace[{0,0,1,1,1},2,2][[1]]
+p2=multiTrace[{0,0,1,1,1},2,NN][[1]]
 l2=p2/.Plus->List;
 l2=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l2//Sort
 
 IP[p1,p1]
-IP[p1,p2]
-IP[p2,p2]
+(*IP[p1,p2]
+IP[p2,p2]*)
