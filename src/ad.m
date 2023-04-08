@@ -92,10 +92,20 @@ decode[m_]:=Module[{n,a1,a2,a3,a4,a5,i,j},
 	{a1,a2,a3,a4,a5,i,j}
 ];
 
-(* (3.13) *)
-factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j},
+(* (3.30) and (3.6-3.8) *)
+factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	{a1,a2,a3,a4,a5,i,j}=decode[m];
-	2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!
+	norm=If[i==j && specialQ,
+		Switch[i,
+			1, 2,
+			2, 6,
+			3, 12
+		]
+	,
+		1
+	];
+	norm=1;
+	2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
@@ -148,3 +158,40 @@ T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
 	];
 	ans
 ];
+
+
+(* ::Section:: *)
+(*Test *)
+
+
+Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
+
+
+(* ::Subsection:: *)
+(*T-matrix*)
+
+
+CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumberQ[n]}/.{-a_:>a}]],0];
+p=multiTrace[{0,0,1,1,2},4,2];
+l=CollectTerms[Flatten[p]];
+
+tmp1 = T[l,l]//Normal
+tmp2 = Table[IPmono[x,y],{x,l},{y,l}]
+tmp1==tmp2
+
+
+(* ::Subsection:: *)
+(*Inner product*)
+
+
+p1=multiTrace[{1,1,0,0,0},2,2][[1]]
+l1=p1/.Plus->List;
+l1=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l1//Sort
+
+p2=multiTrace[{0,0,1,1,1},2,2][[1]]
+l2=p2/.Plus->List;
+l2=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l2//Sort
+
+IP[p1,p1]
+IP[p1,p2]
+IP[p2,p2]
