@@ -33,17 +33,21 @@ time = param["t"] // ToExpression;
 If[time === Null, time = Infinity];
 numKernels = param["k"] // ToExpression;
 
-user = $Username;
-home = Switch[user,
-	"yhlin",
-		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
-			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
-		];
-	,
-	_,
-		Directory[]<>"/"
+If[$FrontEnd===Null,
+	user = $Username;
+	home = Switch[user,
+		"yhlin",
+			If[specialQ,
+				"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
+				,
+				"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
+			];
+		,
+		_,
+			Directory[]<>"/"
+	];
+,
+	home = NotebookDirectory[];
 ];
 
 singleDirectory = home <> "singletrace/";
