@@ -390,6 +390,7 @@ IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	]
 ];
 
+(* Reduced basis at next Y charge via row reduction *)
 ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	QStuff = table[
 		Stuff[];
@@ -402,8 +403,6 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	If[reducedQStuff==={},
 	{{},{}}
 	,
-	(*AllQTerms = CollectTerms[reducedQStuff];
-	Qmatrix = CoefficientArrays[reducedQStuff,AllQTerms][[2]];*)
 	AllQTerms = CollectTerms[QStuff];
 	Qmatrix = CoefficientArrays[QStuff,AllQTerms][[2]];
 	{DeleteCases[SparseArray[Chop[SimpVector . Qmatrix ]]//MyRowReduce,Table[0,{l,1,Length[Qmatrix[[1]]]}]], AllQTerms/.UnTimes->Times}
@@ -423,10 +422,29 @@ ActQNoReduce[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQT
 	If[reducedQStuff==={},
 	{{},{}}
 	,
-	(*AllQTerms = CollectTerms[reducedQStuff];
-	Qmatrix = CoefficientArrays[reducedQStuff,AllQTerms][[2]];*)
 	AllQTerms = CollectTerms[QStuff];
 	Qmatrix = CoefficientArrays[QStuff,AllQTerms][[2]];
+	{DeleteCases[SparseArray[Chop[SimpVector . Qmatrix ]],Table[0,{l,1,Length[Qmatrix[[1]]]}]], AllQTerms/.UnTimes->Times}
+	]
+];
+
+(* Extract coefficients in given basis *)
+ActQWithBasis[SimpVector_,Allterms_,basis_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
+	QStuff = table[
+		Stuff[];
+		Q[t]//GExpand
+	,
+		{t,Allterms}
+	];
+	QStuff = QStuff/.Times->UnTimes;
+	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.](*/.Times->UnTimes*);
+	If[reducedQStuff==={},
+	{{},{}}
+	,
+	(*AllQTerms = CollectTerms[reducedQStuff];
+	Qmatrix = CoefficientArrays[reducedQStuff,AllQTerms][[2]];*)
+	(*AllQTerms = CollectTerms[QStuff];*)
+	Qmatrix = CoefficientArrays[QStuff,basis/.Times->UnTimes][[2]];
 	{DeleteCases[SparseArray[Chop[SimpVector . Qmatrix ]],Table[0,{l,1,Length[Qmatrix[[1]]]}]], AllQTerms/.UnTimes->Times}
 	]
 ];
@@ -439,80 +457,45 @@ MyNormalize[list_] := Module[{fac,rat,den,ans},
 	ans
 ];
 
-AD[charges_,degree_,NN_] := Module[{bare,ind,Qbare,Qind,grav,Allterms,SimpQVector,gravCoVector,SimpVector,QindNR,Q,Qt,M,MQ,h1,h2,h,basis},
+H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Mprev,Mcur,Mnext,hcur,hprev},
+	(* prev (y-1) -> cur (y) -> next (y+1) *)
 	
-	(*** Part 2 ***)
-	
-	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
-	ind = IndStuff[bare];
+	cur = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
+	cur = IndStuff[cur];
 	If[numerical,
-		ind = {MyNormalize[#]&/@ind[[1]],ind[[2]]};
+		cur = {MyNormalize[#]&/@cur[[1]],cur[[2]]};
 	];
-	basis = ind;
-	(*Print[basis];*)
-	Qind = ActQ@@ind;
+	next = ActQ@@cur;
 	If[numerical,
-		Qind = {MyNormalize[#]&/@Qind[[1]],Qind[[2]]};
+		next = {MyNormalize[#]&/@next[[1]],next[[2]]};
 	];
-	QindNR = ActQNoReduce@@ind;
+	Qcur = ActQNoReduce@@cur;
 	If[numerical,
-		QindNR = {MyNormalize[#]&/@QindNR[[1]],QindNR[[2]]};
+		Qcur = {MyNormalize[#]&/@Qcur[[1]],Qcur[[2]]};
 	];
+	Qcur = LinearSolve[Transpose[next[[1]]],Transpose[Qcur[[1]]]];
+	Mcur = T[(# . cur[[2]])&/@cur[[1]]]//Inverse;
+	Mnext = T[(# . next[[2]])&/@next[[1]]]//Inverse;
+	hcur = Mcur . Transpose[Qcur] . Mnext . Qcur;
 	
-	M = T[(# . ind[[2]])&/@ind[[1]]]//Inverse;
-	MQ = T[(# . Qind[[2]])&/@Qind[[1]]]//Inverse;
-	Q = LinearSolve[Transpose[Qind[[1]]],Transpose[QindNR[[1]]]];
-	Qt = Transpose[Q];
-	h2 = M . Qt . MQ . Q;
-	
-	h2/2
-	
-	(* TODO *)
-	(*
-	(*** Part 1 ***)
-	
-	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree-1,NN],0],0.];
-	If[Length[bare]==0,Return[h2/2]];
-	ind = IndStuff[bare];
+	prev = DeleteCases[DeleteCases[MultiTrace[charges,degree-1,NN],0],0.];
+	If[Length[prev]==0,Return[hcur/2]];
+	prev = IndStuff[prev];
 	If[numerical,
-		ind = {MyNormalize[#]&/@ind[[1]],ind[[2]]};
+		prev = {MyNormalize[#]&/@prev[[1]],prev[[2]]};
 	];
-	
-	(*Qind = ActQ@@ind;
+	Qprev = ActQWithBasis@@Join[prev,{cur[[2]]}];
 	If[numerical,
-		Qind = {MyNormalize[#]&/@Qind[[1]],Qind[[2]]};
+		Qprev = {MyNormalize[#]&/@Qprev[[1]],Qprev[[2]]};
 	];
-	Qind = CoefficientArrays[Qind[[1]].Qind[[2]]/.Times->UnTimes,basis[[2]]/.Times->UnTimes];
-	Print[Qind];
-	a = Qind[[1]];
-	b = basis[[1]];
-	Qind = LinearSolve[Qind[[1]],basis[[1]]];
-	Print[Qind];
-	Return[];*)
+	Qprev = LinearSolve[Transpose[cur[[1]]],Transpose[Qprev[[1]]]];
+	Mprev = T[(# . prev[[2]])&/@prev[[1]]]//Inverse;
+	hprev = Mcur . Qprev . Mprev . Transpose[Qprev];
 	
-	QindNR = ActQNoReduce@@ind;
-	If[numerical,
-		QindNR = {MyNormalize[#]&/@QindNR[[1]],QindNR[[2]]};
-	];
-	
-	tmp = QindNR;
-	b = basis;
-	Return[];
-	
-	QindNR = CoefficientArrays[QindNR[[1]].QindNR[[2]]/.Times->UnTimes,basis[[2]]/.Times->UnTimes];
-	Q = LinearSolve[Transpose[QindNR[[1]]],Transpose[basis[[1]]]];
-	Return[Q];
-	
-	M = T[(#.ind[[2]])&/@ind[[1]]]//Inverse;
-	MQ = T[(#.Qind[[2]])&/@Qind[[1]]]//Inverse;
-	Q = LinearSolve[Transpose[Qind[[1]]],Transpose[QindNR[[1]]]];
-	Qt = Transpose[Q];
-	h1 = MQ . Q . M . Qt;
-	
-	h = (h1 + h2)/2;
-	h*)
+	(hcur+hprev)/2
 ];
-(* CM *)
+
+AD[charges_,degree_,NN_] := Eigenvalues[N[H[charges,degree,NN]]];
 
 
 (* ::Section:: *)
@@ -526,10 +509,10 @@ Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
 (*AD*)
 
 
-AD[{0,0,1,1,2},3,3]
+H[{0,0,1,1,2},3,3]//MatrixForm
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*T matrix for non-diagonal product*)
 
 
@@ -552,7 +535,7 @@ decode[16]
 decode[21]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*T-matrix*)
 
 
@@ -566,7 +549,7 @@ tmp3 = TDiag[l]//Normal
 tmp1==tmp2==tmp3
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Inner product*)
 
 
