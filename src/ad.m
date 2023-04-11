@@ -457,7 +457,7 @@ MyNormalize[list_] := Module[{fac,rat,den,ans},
 	ans
 ];
 
-H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Mprev,Mcur,Mnext,hcur,hprev},
+H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
 	(* prev (y-1) -> cur (y) -> next (y+1) *)
 	
 	cur = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
@@ -474,9 +474,9 @@ H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Mprev,Mcur,Mnext,hcu
 		Qcur = {MyNormalize[#]&/@Qcur[[1]],Qcur[[2]]};
 	];
 	Qcur = LinearSolve[Transpose[next[[1]]],Transpose[Qcur[[1]]]];
-	Mcur = T[(# . cur[[2]])&/@cur[[1]]]//Inverse;
-	Mnext = T[(# . next[[2]])&/@next[[1]]]//Inverse;
-	hcur = Mcur . Transpose[Qcur] . Mnext . Qcur;
+	Tcur = T[(# . cur[[2]])&/@cur[[1]]];
+	Tnext = T[(# . next[[2]])&/@next[[1]]];
+	hcur = Inverse[Tcur] . Transpose[Qcur] . Tnext . Qcur;
 	
 	prev = DeleteCases[DeleteCases[MultiTrace[charges,degree-1,NN],0],0.];
 	If[Length[prev]==0,Return[hcur/2]];
@@ -489,13 +489,13 @@ H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Mprev,Mcur,Mnext,hcu
 		Qprev = {MyNormalize[#]&/@Qprev[[1]],Qprev[[2]]};
 	];
 	Qprev = LinearSolve[Transpose[cur[[1]]],Transpose[Qprev[[1]]]];
-	Mprev = T[(# . prev[[2]])&/@prev[[1]]]//Inverse;
-	hprev = Mcur . Qprev . Mprev . Transpose[Qprev];
+	Tprev = T[(# . prev[[2]])&/@prev[[1]]];
+	hprev = Inverse[Tcur] . Qprev . Tprev . Transpose[Qprev];
 	
 	(hcur+hprev)/2
 ];
 
-AD[charges_,degree_,NN_] := Eigenvalues[N[H[charges,degree,NN]]];
+AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 
 
 (* ::Section:: *)
@@ -510,6 +510,11 @@ Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
 
 
 H[{0,0,1,1,2},3,3]//MatrixForm
+AD[{0,0,1,1,2},3,3]
+
+
+H[{0,0,1,1,1},2,3]//MatrixForm
+AD[{0,0,1,1,1},2,3]
 
 
 (* ::Subsection::Closed:: *)
