@@ -24,7 +24,7 @@ param[flag_] := Module[
 
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
-If[specialQ === Null, specialQ = True, specialQ = !specialQ];
+If[specialQ === Null, specialQ = True, specialQ = False];
 minLevel = param["lmin"] // ToExpression;
 maxLevel = param["lmax"] // ToExpression;
 numerical = param["n"] // ToExpression;
@@ -326,8 +326,8 @@ Sub[n_]:=Module[{i,j},
 	,
 		X[n]
 	]
-]/;NN>2;
-Sub[n_]:=X[n]/;NN==2;
+]/;specialQ&&NN>2;
+Sub[n_]:=X[n]/;!specialQ||NN==2;
 
 CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
 
@@ -511,7 +511,6 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*Anomalous dimension (version 1)*)
 
 
-
 Basis[traces_]:=Module[{Allterms,reducedTraces},
 	reducedTraces=traces/.Times->UnTimes;
 	Allterms=CollectTerms[reducedTraces];
@@ -594,6 +593,15 @@ H1[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcu
 AD1[charges_,degree_,NN_] := Eigenvalues[H1[charges,degree,NN]];
 
 
+H1[{0,0,1,1,1},2,3]
+
+
+tmpX
+
+
+tmpY
+
+
 (* ::Section:: *)
 (*Test *)
 
@@ -605,10 +613,16 @@ Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
 (*AD*)
 
 
-H[{0,0,1,1,2},3,3]//MatrixForm
-AD[{0,0,1,1,2},3,3]
-H1[{0,0,1,1,2},3,3]//MatrixForm
-AD1[{0,0,1,1,2},3,3]
+H[{0,0,0,2,2},3,2]//MatrixForm
+AD[{0,0,0,2,2},3,2]
+H1[{0,0,0,2,2},3,2]//MatrixForm
+AD1[{0,0,0,2,2},3,2]
+
+
+H[{0,0,1,1,1},2,2]//MatrixForm
+AD[{0,0,1,1,1},2,2]
+H1[{0,0,1,1,1},2,2]//MatrixForm
+AD1[{0,0,1,1,1},2,2]
 
 
 H[{0,0,1,1,1},2,3]//MatrixForm
@@ -617,10 +631,10 @@ H1[{0,0,1,1,1},2,3]//MatrixForm
 AD1[{0,0,1,1,1},2,3]
 
 
-H[{0,0,1,1,1},2,2]//MatrixForm
-AD[{0,0,1,1,1},2,2]
-H1[{0,0,1,1,1},2,2]//MatrixForm
-AD1[{0,0,1,1,1},2,2]
+H[{0,0,1,1,2},3,3]//MatrixForm
+AD[{0,0,1,1,2},3,3]
+H1[{0,0,1,1,2},3,3]//MatrixForm
+AD1[{0,0,1,1,2},3,3]
 
 
 (* ::Subsection::Closed:: *)
