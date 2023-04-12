@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Input*)
 
 
 options = $CommandLine;
-options = {"-N", "3", "-lmin", "4", "-lmax", "4"};
+options = {"-N", "2", "-lmin", "4", "-lmax", "4", "-u"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -192,7 +192,7 @@ Stuff[];
 
 
 (* ::Subsubsection::Closed:: *)
-(*Inner product*)
+(*Inner product (TO CHECK)*)
 
 
 (* TODO: Can make more efficient by bit shifting *)
@@ -226,7 +226,6 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	norm=1;
 	2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
@@ -243,6 +242,8 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	If[t1=!=t2,Return[0]];
 	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
 ];
+
+(* TO DEPRECIATE *)
 (*IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	l1=m1/.NonCommutativeMultiply->Times/.{Power->List,Times->List};
 	If[!ListQ[l1],l1={l1}];
@@ -256,8 +257,9 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
 ];*)
 
+(* TO DEPRECIATE *)
 (* Inner product of polynomials using 2-finger algorithm *)
-IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
+(*IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
 	l1=p1/.Plus->List;
 	l1=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l1//Sort;
 	l2=p2/.Plus->List;
@@ -273,7 +275,7 @@ IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
 		];
 	];
 	ans
-];
+];*)
 
 (* Valid for U(N) and SU(2) *)
 (* T-matrix for list of monomials using 2-finger algorithm *)
@@ -286,8 +288,9 @@ TDiag[l_]:=Module[{ans},
 	];
 	ans
 ];
+
 (* TO DEPRECIATE *)
-T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
+(*T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
 	(* sort l1, l2 *)
 	ord1 = Ordering[l1];
 	ll1 = l1[[ord1]];
@@ -303,7 +306,7 @@ T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
 		];
 	];
 	ans
-];
+];*)
 
 (* (3.6-3.8) *)
 ChangeIJ[n_,i_,j_]:=2^4*Quotient[n,2^4]+(i-1)*2^2+(j-1);
@@ -384,7 +387,7 @@ If[numKernels === Null,
 
 
 (* ::Subsubsection::Closed:: *)
-(*Anomalous dimension (version 0)*)
+(*Anomalous dimension (old version)*)
 
 
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
@@ -466,7 +469,7 @@ MyNormalize[list_] := Module[{fac,rat,den,ans},
 	ans
 ];
 
-H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
+H0[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
 	(* prev (y-1) -> cur (y) -> next (y+1) *)
 	
 	cur = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
@@ -504,39 +507,47 @@ H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcu
 	(hcur+hprev)/2
 ];
 
-AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
+AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 
 
 (* ::Subsubsection::Closed:: *)
-(*Anomalous dimension (version 1)*)
+(*Anomalous dimension (TO CHECK)*)
 
 
+(* Basis of monomials *)
 Basis[traces_]:=Module[{Allterms,reducedTraces},
 	reducedTraces=traces/.Times->UnTimes;
 	Allterms=CollectTerms[reducedTraces];
 	Allterms/.UnTimes->Times
 ];
 
-(*IndStuffBasis[traces_,cur_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
-	If[traces=={},{{},{}},
-		reducedTraces=traces/.Times->UnTimes;
-		CoVector=CoefficientArrays[reducedTraces,cur/.Times->UnTimes][[2]];
-		CoVector
-	]
-];*)
-
+(* Row reduction *)
 IndStuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{{},{}},
 		reducedTraces=traces/.Times->UnTimes;
 		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
 		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
-		(*{SimpVector , basis}*)
 		SimpVector
 	]
 ];
 
-(* Extract coefficients in given basis *)
-ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
+(* Basis and IndStuffBasis together *)
+GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
+	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
+	If[Length[bare]==0,
+		Return[{{},{}}]
+	];
+	basis = Basis[bare];
+	Ared = IndStuffBasis[bare,basis];
+	If[numerical,
+		Ared = {MyNormalize[#]&/@Ared[[1]],Ared[[2]]};
+	];
+	Ared = Transpose[Ared];
+	{basis,Ared}
+];
+
+(* Extract Q matrix in given bases *)
+ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	QStuff = table[
 		Stuff[];
 		Q[t]//GExpand
@@ -544,97 +555,88 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 		{t,cur}
 	];
 	QStuff = QStuff/.Times->UnTimes;
-	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.](*/.Times->UnTimes*);
+	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
 	If[reducedQStuff==={},
 	{{},{}}
 	,
 	Qmatrix = CoefficientArrays[QStuff,next/.Times->UnTimes][[2]];
+	Qmatrix = Transpose[Qmatrix];
 	Qmatrix
 	]
 ];
 
-H1[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
-	(* prev (y-1) -> cur (y) -> next (y+1) *)
+H[charges_,degree_,NN_] := Module[{basis,Ared,TT,M,q,Q,h},
+	(* prev (-1) -> cur (0) -> next (1) *)
 	
-	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
-	cur = Basis[bare];
-	Ared = IndStuffBasis[bare,cur];
-	If[numerical,
-		Ared = {MyNormalize[#]&/@Ared[[1]],Ared[[2]]};
-	];
-	Ared = Transpose[Ared];
-	
-	next = DeleteCases[DeleteCases[MultiTrace[charges,degree+1,NN],0],0.];
-	next = Basis[next];
-	If[Length[next]==0,
-	hcur = 0
+	Do[
+		{basis[i],Ared[i]} = GetBasis[charges,degree+i,NN];
+		If[
+			Length[basis[i]]>0
+		,
+			TT[i] = T[basis[i]];
+			M[i] = Transpose[Ared[i]] . TT[i] . Ared[i];
+		];
+		
+		If[i==0,
+			If[Length[basis[-1]]>0
+			,
+				q[i-1] = ActQBasis[basis[i-1],basis[i]];
+				Q[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[-1] = Q[-1] . Inverse[M[-1]] . Transpose[Q[-1]]/2;
+				h[-1] = Inverse[M[0]] . Q[-1] . Inverse[M[-1]] . Transpose[Q[-1]]/2;
+			,
+				h[-1] = 0;
+			];
+		];
+		
+		If[i==1,
+			If[Length[basis[1]]>0
+			,
+				q[i-1] = ActQBasis[basis[i-1],basis[i]];
+				Q[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[0] = Transpose[Q[0]] . Inverse[M[1]] . Q[0]/2;
+				h[0] = Inverse[M[0]] . Transpose[Q[0]] . Inverse[M[1]] . Q[0]/2;
+			,
+				h[0] = 0;
+			];
+		];
 	,
-	Qcur = ActQBasis[cur,next];
-	Qcur = Transpose[Qcur];
-	Tcur = T[cur];
-	Tnext = T[next];
-	hcur = Transpose[Ared] . Inverse[Tcur] . Transpose[Qcur] . Tnext . Qcur . Ared;
+		{i,-1,1}
 	];
 	
-	prev = DeleteCases[DeleteCases[MultiTrace[charges,degree-1,NN],0],0.];
-	prev = Basis[prev];
-	If[Length[prev]==0,
-	hprev = 0
-	,
-	Qprev = ActQBasis[prev,cur];
-	Qprev = Transpose[Qprev];
-	Tprev = T[prev];
-	hprev = Transpose[Ared] . Qprev . Inverse[Tprev] . Transpose[Qprev] . Tcur . Ared;
-	];
-	
-	(hprev+hcur)/2
+	h[-1]+h[0]
 ];
 
-AD1[charges_,degree_,NN_] := Eigenvalues[H1[charges,degree,NN]];
-
-
-H1[{0,0,1,1,1},2,3]
-
-
-tmpX
-
-
-tmpY
+AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 
 
 (* ::Section:: *)
 (*Test *)
 
 
-Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
-
-
 (* ::Subsection:: *)
 (*AD*)
 
 
-H[{0,0,0,2,2},3,2]//MatrixForm
-AD[{0,0,0,2,2},3,2]
-H1[{0,0,0,2,2},3,2]//MatrixForm
-AD1[{0,0,0,2,2},3,2]
-
-
+(* Konishi *)
 H[{0,0,1,1,1},2,2]//MatrixForm
 AD[{0,0,1,1,1},2,2]
-H1[{0,0,1,1,1},2,2]//MatrixForm
-AD1[{0,0,1,1,1},2,2]
-
-
 H[{0,0,1,1,1},2,3]//MatrixForm
 AD[{0,0,1,1,1},2,3]
-H1[{0,0,1,1,1},2,3]//MatrixForm
-AD1[{0,0,1,1,1},2,3]
 
 
-H[{0,0,1,1,2},3,3]//MatrixForm
-AD[{0,0,1,1,2},3,3]
-H1[{0,0,1,1,2},3,3]//MatrixForm
-AD1[{0,0,1,1,2},3,3]
+(* Check HH is hermitian *)
+(*H[{0,0,0,2,2},3,2]//MatrixForm
+HH[0]//MatrixForm*)
+
+
+(* Check that matrices are produced for various charges *)
+(*H[{0,0,1,1,1},1,2]//MatrixForm
+H[{0,0,1,1,1},2,2]//MatrixForm
+H[{0,0,1,1,1},3,2]//MatrixForm
+H[{0,0,0,2,2},3,2]//MatrixForm
+H[{0,0,1,1,1},2,3]//MatrixForm
+H[{0,0,1,1,2},3,3]//MatrixForm*)
 
 
 (* ::Subsection::Closed:: *)
