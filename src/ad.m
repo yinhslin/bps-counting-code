@@ -62,6 +62,10 @@ miscDirectory = home <> "misc/";
 (*Count*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*Multi-trace*)
+
+
 MultiTrace[charges_,degree_,NN_] := Module[{level,filename,ans},
 	level = charges . {3,3,2,2,2};
 	filename = multiDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
@@ -331,7 +335,8 @@ CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 T[l_]:=Module[{ll,allTerms,matrix},
-	ll=l/.X[n_]:>Sub[n]//Expand;
+	ll=l/.X[n_]:>Sub[n];
+	ll=(#/.nc_NonCommutativeMultiply:>Distribute[nc]//Expand)&/@ll;
 	ll=ll/.Times->UnTimes;
 	allTerms = CollectTerms[ll];
 	matrix = CoefficientArrays[ll,allTerms][[2]];
@@ -340,8 +345,8 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection:: *)
-(*Anomalous dimension*)
+(* ::Subsubsection::Closed:: *)
+(*Numerical*)
 
 
 If[numerical,
@@ -377,7 +382,11 @@ If[numKernels === Null,
 	table = ParallelTable
 ];
 
-(* CM *)
+
+(* ::Subsubsection::Closed:: *)
+(*Anomalous dimension (version 0)*)
+
+
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
@@ -495,29 +504,13 @@ H[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcu
 	(hcur+hprev)/2
 ];
 
-H1[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
-	(* prev (y-1) -> cur (y) -> next (y+1) *)
-	
-	cur = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
-	cur = IndStuff[cur];
-	If[numerical,
-		cur = {MyNormalize[#]&/@cur[[1]],cur[[2]]};
-	];
-	next = ActQ@@cur;
-	If[numerical,
-		next = {MyNormalize[#]&/@next[[1]],next[[2]]};
-	];
-	Qcur = ActQNoReduce@@cur;
-	If[numerical,
-		Qcur = {MyNormalize[#]&/@Qcur[[1]],Qcur[[2]]};
-	];
-	Qcur = LinearSolve[Transpose[next[[1]]],Transpose[Qcur[[1]]]];
-	Tcur = T[(# . cur[[2]])&/@cur[[1]]];
-	Tnext = T[(# . next[[2]])&/@next[[1]]];
-	hcur = Inverse[Tcur] . Transpose[Qcur] . Tnext . Qcur;
-	
-	hcur
-];
+AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Anomalous dimension (version 1)*)
+
+
 
 Basis[traces_]:=Module[{Allterms,reducedTraces},
 	reducedTraces=traces/.Times->UnTimes;
@@ -561,41 +554,7 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	]
 ];
 
-H2[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
-	(* prev (y-1) -> cur (y) -> next (y+1) *)
-	
-	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
-	cur = Basis[bare];
-	Ared = IndStuffBasis[bare,cur];
-	If[numerical,
-		Ared = {MyNormalize[#]&/@Ared[[1]],Ared[[2]]};
-	];
-	Ared = Transpose[Ared];
-	
-	next = DeleteCases[DeleteCases[MultiTrace[charges,degree+1,NN],0],0.];
-	next = Basis[next];
-	
-	Qcur = ActQBasis[cur,next];
-	Qcur = Transpose[Qcur];
-	(*If[numerical,
-		Qcur = {MyNormalize[#]&/@Qcur[[1]],Qcur[[2]]};
-	];*)
-	Tcur = T[cur];
-	Tnext = T[next];
-	
-	(*Print["cur ", cur//Length];
-	Print["next ", next//Length];
-	Print["Ared ", Ared//Dimensions];
-	Print["Tcur ", Tcur//Dimensions];
-	Print["Qcur ", Qcur//Dimensions];
-	Print["Tnext ", Tnext//Dimensions];*)
-	
-	hcur = Transpose[Ared] . Inverse[Tcur] . Transpose[Qcur] . Tnext . Qcur . Ared;
-	
-	hcur/2
-];
-
-H3[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
+H1[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcur,Tnext,hcur,hprev},
 	(* prev (y-1) -> cur (y) -> next (y+1) *)
 	
 	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
@@ -626,24 +585,13 @@ H3[charges_,degree_,NN_] := Module[{bare,prev,cur,Ared,next,Qcur,Qprev,Tprev,Tcu
 	Qprev = ActQBasis[prev,cur];
 	Qprev = Transpose[Qprev];
 	Tprev = T[prev];
-	
-	Print[Tprev//MatrixForm];
-	Return[];
-	
-	(*Print["cur ", cur//Length];
-	Print["prev ", prev//Length];
-	Print["Ared ", Ared//Dimensions];
-	Print["Tcur ", Tcur//Dimensions];
-	Print["Qprev ", Qprev//Dimensions];
-	Print["Tprev ", Tprev//Dimensions];*)
-	
 	hprev = Transpose[Ared] . Qprev . Inverse[Tprev] . Transpose[Qprev] . Tcur . Ared;
 	];
 	
 	(hprev+hcur)/2
 ];
 
-AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
+AD1[charges_,degree_,NN_] := Eigenvalues[H1[charges,degree,NN]];
 
 
 (* ::Section:: *)
@@ -657,19 +605,22 @@ Get[#]&/@FileNames[multiDirectory<>"*"<>ToString[NN]<>".mx"];
 (*AD*)
 
 
-H3[{0,0,1,1,2},3,3]
-
-
 H[{0,0,1,1,2},3,3]//MatrixForm
 AD[{0,0,1,1,2},3,3]
+H1[{0,0,1,1,2},3,3]//MatrixForm
+AD1[{0,0,1,1,2},3,3]
 
 
 H[{0,0,1,1,1},2,3]//MatrixForm
 AD[{0,0,1,1,1},2,3]
+H1[{0,0,1,1,1},2,3]//MatrixForm
+AD1[{0,0,1,1,1},2,3]
 
 
 H[{0,0,1,1,1},2,2]//MatrixForm
 AD[{0,0,1,1,1},2,2]
+H1[{0,0,1,1,1},2,2]//MatrixForm
+AD1[{0,0,1,1,1},2,2]
 
 
 (* ::Subsection::Closed:: *)
