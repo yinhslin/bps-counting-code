@@ -24,7 +24,7 @@ param[flag_] := Module[
 
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
-If[specialQ === Null, specialQ = True, specialQ = !specialQ];
+If[specialQ === Null, specialQ = True, specialQ = False];
 level = param["l"] // ToExpression;
 ind = param["i"] // ToExpression;
 degree = param["d"] // ToExpression;

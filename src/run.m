@@ -24,7 +24,7 @@ param[flag_] := Module[
 
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
-If[specialQ === Null, specialQ = True, specialQ = !specialQ];
+If[specialQ === Null, specialQ = True, specialQ = False];
 minLevel = param["lmin"] // ToExpression;
 maxLevel = param["lmax"] // ToExpression;
 ind = param["i"] // ToExpression;
