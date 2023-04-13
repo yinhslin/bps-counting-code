@@ -59,7 +59,7 @@ Seeds[multiGravitonCharge_,nTrace_] := Module[{pivot = Position[multiGravitonCha
 DistriCharges[tmp_] := Module[{lis = {},x},
 	Do[
 		x = {x1,x2,x3,x4,x5};
-		If[Min[Total[x]]>minDeg,
+		If[Min[Total[x]] >= minDeg,
 			AppendTo[lis,x];
 		];
 	,
