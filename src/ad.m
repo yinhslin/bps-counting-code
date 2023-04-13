@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-options = {"-N", "2", "-lmin", "4", "-lmax", "4", "-u"};
+options = {"-N", "2", "-lmin", "4", "-lmax", "4"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -191,7 +191,7 @@ Q[X[a_]]:=
 Stuff[];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Inner product (TO CHECK)*)
 
 
@@ -278,7 +278,7 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 ];*)
 
 (* Valid for U(N) and SU(2) *)
-(* T-matrix for list of monomials using 2-finger algorithm *)
+(* T-matrix for list of monomials *)
 TDiag[l_]:=Module[{ans},
 	ans=SparseArray[{},{Length[l],Length[l]}];
 	Do[
@@ -309,21 +309,21 @@ TDiag[l_]:=Module[{ans},
 ];*)
 
 (* (3.6-3.8) *)
-ChangeIJ[n_,i_,j_]:=2^4*Quotient[n,2^4]+(i-1)*2^2+(j-1);
+SetIJ[n_,i_,j_]:=2^4*Quotient[n,2^4]+(i-1)*2^2+(j-1);
 Sub[n_]:=Module[{i,j},
 	{i,j}={mati[n],matj[n]};
 	If[i==j,
 		Switch[NN,
 			3,
 				Switch[i,
-					1, -X[n]+X[ChangeIJ[n,2,2]],
-					2, X[n]+X[ChangeIJ[n,2,2]]
+					1, -X[n]+X[SetIJ[n,2,2]],
+					2, X[SetIJ[n,1,1]]+X[n]
 				],
 			4,
 				Switch[i,
-					1, -X[n]-X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]],
-					2, 2X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]],
-					3, X[n]-X[ChangeIJ[n,2,2]]+X[ChangeIJ[n,3,3]]
+					1, -X[n]-X[SetIJ[n,2,2]]+X[SetIJ[n,3,3]],
+					2, 2X[n]+X[SetIJ[n,3,3]],
+					3, X[SetIJ[n,1,1]]-X[SetIJ[n,2,2]]+X[n]
 				]
 		]
 	,
@@ -344,6 +344,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 	allTerms = CollectTerms[ll];
 	matrix = CoefficientArrays[ll,allTerms][[2]];
 	allTerms = allTerms/.UnTimes->Times;
+	(* TODO: dagger *)
 	matrix . TDiag[allTerms] . Transpose[matrix]
 ];
 
@@ -510,7 +511,7 @@ H0[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hc
 AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension (TO CHECK)*)
 
 
@@ -628,8 +629,20 @@ basis[0] . Ared[0]/.X[m_]:>X[decode[m]]
 MultiTrace[{0,0,0,1,1},2,2]/.X[m_]:>X[decode[m]]
 
 
+H[{0,0,1,1,1},3,2]//MatrixForm
+AD[{0,0,1,1,1},3,2]
+H[{0,0,1,1,1},2,2]//MatrixForm
+AD[{0,0,1,1,1},2,2]
 H[{0,0,0,2,2},4,2]//MatrixForm
 AD[{0,0,0,2,2},4,2]
+
+
+H[{0,0,1,1,1},3,3]//MatrixForm
+AD[{0,0,1,1,1},3,3]
+H[{0,0,1,1,1},2,3]//MatrixForm
+AD[{0,0,1,1,1},2,3]
+H[{0,0,0,2,2},4,3]//MatrixForm
+AD[{0,0,0,2,2},4,3]
 
 
 (*
