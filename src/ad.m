@@ -58,7 +58,7 @@ juliaDirectory = home <> "julia/";
 miscDirectory = home <> "misc/";
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Count*)
 
 
@@ -191,7 +191,7 @@ Q[X[a_]]:=
 Stuff[];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Inner product (TO CHECK)*)
 
 
@@ -529,7 +529,7 @@ H0[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hc
 AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension (TO CHECK)*)
 
 
@@ -638,6 +638,20 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*Tao*)
 
 
+H[{0,0,0,2,2},4,2]//MatrixForm
+
+{basis[-1]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
+TT[-1]//Normal//MatrixForm
+M[-1]//Normal//MatrixForm
+
+{basis[0]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
+TT[0]//Normal//MatrixForm
+M[0]//Normal//MatrixForm
+
+q[-1]//Normal//MatrixForm
+Q[-1]//Normal//MatrixForm
+
+
 (* Manually check Tao's Section 1.2 *)
 Get[home <> "singletrace.m"];
 StuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
@@ -676,12 +690,6 @@ tao[0] = GetBasisTao[{0,0,0,2,2},4,2];
 tao[0][[1]]===basis[0]
 Ared[0]//MatrixForm
 tao[0][[2]]//MatrixForm
-
-
-H[{0,0,0,2,2},4,2]//MatrixForm
-Q[-1]//Normal//MatrixForm
-M[-1]//Normal//MatrixForm
-M[0]//Normal//MatrixForm
 
 
 (* ::Subsection::Closed:: *)
