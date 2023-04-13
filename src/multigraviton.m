@@ -59,7 +59,7 @@ Seeds[multiGravitonCharge_,nTrace_] := Module[{pivot = Position[multiGravitonCha
 DistriCharges[tmp_] := Module[{lis = {},x},
 	Do[
 		x = {x1,x2,x3,x4,x5};
-		If[Min[Total[x]]>1,
+		If[Min[Total[x]]>minDeg,
 			AppendTo[lis,x];
 		];
 	,
@@ -68,7 +68,7 @@ DistriCharges[tmp_] := Module[{lis = {},x},
 	DeleteDuplicates[Sort/@Transpose/@lis]
 ];
 
-MultiGravitonChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/2}];
+MultiGravitonChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/minDeg}];
 
 MaxDeg[charges_] := Plus@@charges;
 
