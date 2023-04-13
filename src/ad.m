@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-options = {"-N", "2", "-lmin", "4", "-lmax", "4"};
+options = {"-N", "4", "-lmin", "4", "-lmax", "4"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -58,7 +58,7 @@ juliaDirectory = home <> "julia/";
 miscDirectory = home <> "misc/";
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Count*)
 
 
@@ -191,7 +191,7 @@ Q[X[a_]]:=
 Stuff[];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Inner product (TO CHECK)*)
 
 
@@ -279,6 +279,8 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 
 (* Valid for U(N) and SU(2) *)
 (* T-matrix for list of monomials *)
+
+(* original *)
 TDiag[l_]:=Module[{ans},
 	ans=SparseArray[{},{Length[l],Length[l]}];
 	Do[
@@ -288,6 +290,21 @@ TDiag[l_]:=Module[{ans},
 	];
 	ans
 ];
+
+(* TODO *)
+(* transpose *)
+(*SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
+TDiag[l_]:=Module[{tp,j,ans},
+	ans=SparseArray[{},{Length[l],Length[l]}];
+	Do[
+		tp=l[[i]]/.X[n_]:>X[SwapIJ[n]]/.-expr_:>expr;
+		j=Position[l,tp][[1,1]];
+		ans[[i,j]]=IPmono[l[[i]],l[[i]]];
+	,
+		{i,1,Length[l]}
+	];
+	ans
+];*)
 
 (* TO DEPRECIATE *)
 (*T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
@@ -345,6 +362,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 	matrix = CoefficientArrays[ll,allTerms][[2]];
 	allTerms = allTerms/.UnTimes->Times;
 	(* TODO: dagger *)
+	(*Print[allTerms];*)
 	matrix . TDiag[allTerms] . Transpose[matrix]
 ];
 
@@ -511,7 +529,7 @@ H0[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hc
 AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension (TO CHECK)*)
 
 
@@ -616,33 +634,53 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*Test *)
 
 
+(* ::Subsection::Closed:: *)
+(*Tao*)
+
+
+(* Manually check Tao's Section 1.2 *)
+Get[home <> "singletrace.m"];
+StuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
+	If[traces=={},{{},{}},
+		reducedTraces=traces/.Times->UnTimes;
+		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
+		SimpVector = DeleteCases[CoVector,Table[0,{l,1,Length[CoVector[[1]]]}]];
+		SimpVector
+	]
+];
+tr[charges_] := MonoCharge[charges,NN];
+GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared,x,y,\[Psi]},
+	x = {0,0,0,0,1};
+	y = {0,0,0,1,0};
+	\[Psi] = {0,0,0,1,1};
+	bare=Switch[degree,
+		4, {tr[{x,x}]tr[{y,y}], tr[{x,y}]tr[{x,y}], tr[{x,x,y,y}], tr[{x,y,x,y}]}
+	,
+		3, {tr[{\[Psi],x,y}]-tr[{\[Psi],y,x}]}
+	,
+		_, {}
+	]//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;
+	basis = Basis[bare];
+	Ared = StuffBasis[bare,basis];
+	Ared = Transpose[Ared];
+	{basis,Ared}
+];
+
+
+GetBasis[{0,0,0,2,2},4,2][[2]]
+
+
+H[{0,0,0,2,2},4,2]
+
+
 (* ::Subsection:: *)
 (*AD*)
 
 
-H[{0,0,0,1,1},2,2]//MatrixForm
-
-
-basis[0] . Ared[0]/.X[m_]:>X[decode[m]]
-
-
-MultiTrace[{0,0,0,1,1},2,2]/.X[m_]:>X[decode[m]]
-
-
-H[{0,0,1,1,1},3,2]//MatrixForm
-AD[{0,0,1,1,1},3,2]
-H[{0,0,1,1,1},2,2]//MatrixForm
-AD[{0,0,1,1,1},2,2]
-H[{0,0,0,2,2},4,2]//MatrixForm
-AD[{0,0,0,2,2},4,2]
-
-
-H[{0,0,1,1,1},3,3]//MatrixForm
-AD[{0,0,1,1,1},3,3]
-H[{0,0,1,1,1},2,3]//MatrixForm
-AD[{0,0,1,1,1},2,3]
-H[{0,0,0,2,2},4,3]//MatrixForm
-AD[{0,0,0,2,2},4,3]
+AD[{0,0,1,1,1},3,NN]
+AD[{0,0,1,1,1},2,NN]
+AD[{0,0,0,2,2},4,NN]
+H[{0,0,0,2,2},4,NN]//MatrixForm
 
 
 (*
