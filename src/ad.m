@@ -640,10 +640,12 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 
 H[{0,0,0,2,2},4,2]//MatrixForm
 
+{basis[-1]}//Transpose//MatrixForm
 {basis[-1]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
 TT[-1]//Normal//MatrixForm
 M[-1]//Normal//MatrixForm
 
+{basis[0]}//Transpose//MatrixForm
 {basis[0]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
 TT[0]//Normal//MatrixForm
 M[0]//Normal//MatrixForm
