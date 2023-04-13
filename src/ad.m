@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-options = {"-N", "4", "-lmin", "4", "-lmax", "4"};
+options = {"-N", "2", "-lmin", "4", "-lmax", "4"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -634,7 +634,7 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*Test *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Tao*)
 
 
@@ -649,7 +649,7 @@ StuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	]
 ];
 tr[charges_] := MonoCharge[charges,NN];
-GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared,x,y,\[Psi]},
+GetBasisTao[charges_,degree_,NN_]:=Module[{bare,basis,Ared,x,y,\[Psi]},
 	x = {0,0,0,0,1};
 	y = {0,0,0,1,0};
 	\[Psi] = {0,0,0,1,1};
@@ -667,13 +667,24 @@ GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared,x,y,\[Psi]},
 ];
 
 
-GetBasis[{0,0,0,2,2},4,2][[2]]
+tao[-1] = GetBasisTao[{0,0,0,2,2},3,2];
+tao[-1][[1]]===basis[-1]
+Ared[-1]//MatrixForm
+tao[-1][[2]]//MatrixForm
+
+tao[0] = GetBasisTao[{0,0,0,2,2},4,2];
+tao[0][[1]]===basis[0]
+Ared[0]//MatrixForm
+tao[0][[2]]//MatrixForm
 
 
-H[{0,0,0,2,2},4,2]
+H[{0,0,0,2,2},4,2]//MatrixForm
+Q[-1]//Normal//MatrixForm
+M[-1]//Normal//MatrixForm
+M[0]//Normal//MatrixForm
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*AD*)
 
 
