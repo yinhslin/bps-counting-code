@@ -6,7 +6,7 @@
 
 Protect[nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3,z1,z2,th1,th2,th3];
 
-group = If[NN==2,
+group = If[specialQ && NN==2,
 	DihedralGroup,
 	CyclicGroup
 ];
