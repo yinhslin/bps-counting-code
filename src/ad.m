@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Input*)
 
 
@@ -510,7 +510,7 @@ H0[charges_,degree_,NN_] := Module[{prev,cur,next,Qcur,Qprev,Tprev,Tcur,Tnext,hc
 AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension (TO CHECK)*)
 
 
@@ -540,7 +540,7 @@ GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
 	basis = Basis[bare];
 	Ared = IndStuffBasis[bare,basis];
 	If[numerical,
-		Ared = {MyNormalize[#]&/@Ared[[1]],Ared[[2]]};
+		Ared = {MyNormalize[#]&/@Ared,basis};
 	];
 	Ared = Transpose[Ared];
 	{basis,Ared}
@@ -565,7 +565,8 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	]
 ];
 
-H[charges_,degree_,NN_] := Module[{basis,Ared,TT,M,q,Q,h},
+Clear[H];
+H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,Q,h*)},
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
@@ -618,11 +619,29 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*AD*)
 
 
-(* Konishi *)
+H[{0,0,0,1,1},2,2]//MatrixForm
+
+
+basis[0] . Ared[0]/.X[m_]:>X[decode[m]]
+
+
+MultiTrace[{0,0,0,1,1},2,2]/.X[m_]:>X[decode[m]]
+
+
+H[{0,0,0,2,2},4,2]//MatrixForm
+AD[{0,0,0,2,2},4,2]
+
+
+(*
+H[{0,0,1,1,1},3,2]//MatrixForm
+AD[{0,0,1,1,1},3,2]
 H[{0,0,1,1,1},2,2]//MatrixForm
 AD[{0,0,1,1,1},2,2]
+H[{0,0,1,1,1},3,3]//MatrixForm
+AD[{0,0,1,1,1},3,3]
 H[{0,0,1,1,1},2,3]//MatrixForm
 AD[{0,0,1,1,1},2,3]
+*)
 
 
 (* Check HH is hermitian *)
