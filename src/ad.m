@@ -635,7 +635,73 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 
 
 (* ::Subsection:: *)
-(*Tao*)
+(*Tao 1.1*)
+
+
+H[{0,0,1,1,1},3,2]//MatrixForm
+
+{basis[-1]}//Transpose//MatrixForm
+{basis[-1]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
+TT[-1]//Normal//MatrixForm
+M[-1]//Normal//MatrixForm
+
+{basis[0]}//Transpose//MatrixForm
+{basis[0]}/.X[n_]:>X[decode[n]]//Transpose//MatrixForm
+TT[0]//Normal//MatrixForm
+M[0]//Normal//MatrixForm
+
+q[-1]//Normal//MatrixForm
+Q[-1]//Normal//MatrixForm
+
+
+(* Manually check Tao's Section 1.2 *)
+Get[home <> "singletrace.m"];
+StuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
+	If[traces=={},{{},{}},
+		reducedTraces=traces/.Times->UnTimes;
+		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
+		SimpVector = DeleteCases[CoVector,Table[0,{l,1,Length[CoVector[[1]]]}]];
+		SimpVector
+	]
+];
+tr[charges_] := MonoCharge[charges,NN];
+GetBasisTao[charges_,degree_,NN_]:=Module[{bare,basis,Ared,x,y,z,\[Psi]x,\[Psi]y,\[Psi]z},
+	x = {0,0,0,0,1};
+	y = {0,0,0,1,0};
+	z = {0,0,1,0,0};
+	\[Psi]x = {0,0,1,1,0};
+	\[Psi]y = {0,0,1,0,1};
+	\[Psi]z = {0,0,0,1,1};
+	bare=Switch[degree,
+		3, {tr[{x,y,z}],tr[{x,z,y}]}
+	,
+		2, {tr[{\[Psi]z,z}]+tr[{\[Psi]y,y}]+tr[{\[Psi]x,x}]}
+	,
+		_, {}
+	]//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;
+	basis = Basis[bare];
+	If[degree==2,
+		basis = {X[64] X[32816],X[65] X[32820],X[68] X[32817],X[32] X[32848],X[33] X[32852],X[36] X[32849],X[16] X[32864],X[17] X[32868],X[20] X[32865]}
+	];
+	Ared = StuffBasis[bare,basis];
+	Ared = Transpose[Ared];
+	{basis,Ared}
+];
+
+
+tao[-1] = GetBasisTao[{0,0,1,1,1},2,2];
+tao[-1][[1]]===basis[-1]
+Ared[-1]//MatrixForm
+tao[-1][[2]]//MatrixForm
+
+tao[0] = GetBasisTao[{0,0,1,1,1},3,2];
+tao[0][[1]]===basis[0]
+Ared[0]//MatrixForm
+tao[0][[2]]//MatrixForm
+
+
+(* ::Subsection:: *)
+(*Tao 1.2*)
 
 
 H[{0,0,0,2,2},4,2]//MatrixForm
