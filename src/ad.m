@@ -191,7 +191,7 @@ Q[X[a_]]:=
 Stuff[];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Inner product (TO CHECK)*)
 
 
@@ -585,7 +585,7 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 ];
 
 Clear[H];
-H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,Q,h*)},
+H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
@@ -601,9 +601,9 @@ H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,Q,h*)},
 			If[Length[basis[-1]]>0
 			,
 				q[i-1] = ActQBasis[basis[i-1],basis[i]];
-				Q[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
-				HH[-1] = Q[-1] . Inverse[M[-1]] . Transpose[Q[-1]]/2;
-				h[-1] = Inverse[M[0]] . Q[-1] . Inverse[M[-1]] . Transpose[Q[-1]]/2;
+				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[-1] = QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
+				h[-1] = Inverse[M[0]] . QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
 			,
 				h[-1] = 0;
 			];
@@ -613,9 +613,120 @@ H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,Q,h*)},
 			If[Length[basis[1]]>0
 			,
 				q[i-1] = ActQBasis[basis[i-1],basis[i]];
-				Q[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
-				HH[0] = Transpose[Q[0]] . Inverse[M[1]] . Q[0]/2;
-				h[0] = Inverse[M[0]] . Transpose[Q[0]] . Inverse[M[1]] . Q[0]/2;
+				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[0] = Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
+				h[0] = Inverse[M[0]] . Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
+			,
+				h[0] = 0;
+			];
+		];
+	,
+		{i,-1,1}
+	];
+	
+	h[-1]+h[0]
+];
+
+AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
+
+
+(* ::Subsubsection:: *)
+(*Anomalous dimension dagger (TO CHECK)*)
+
+
+(* dagger *)
+SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
+DaggerPermutation[basis_]:=Module[{dag},
+	dag=basis/.X[n_]:>X[SwapIJ[n]]/.Times->UnTimes;
+	CoefficientArrays[dag,basis/.Times->UnTimes][[2]]
+];
+DP[basis_]:=DaggerPermutation[basis];
+
+
+(* Basis of monomials *)
+Basis[traces_]:=Module[{Allterms,reducedTraces},
+	reducedTraces=traces/.Times->UnTimes;
+	Allterms=CollectTerms[reducedTraces];
+	Allterms/.UnTimes->Times
+];
+
+(* Row reduction *)
+IndStuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
+	If[traces=={},{{},{}},
+		reducedTraces=traces/.Times->UnTimes;
+		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
+		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
+		SimpVector
+	]
+];
+
+Clear[GetBasis];
+(* Basis and IndStuffBasis together *)
+GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
+	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
+	If[Length[bare]==0,
+		Return[{{},{},{}}]
+	];
+	basis = Basis[bare];
+	Ared = IndStuffBasis[bare,basis];
+	If[numerical,
+		Ared = {MyNormalize[#]&/@Ared,basis};
+	];
+	Ared = Transpose[Ared];
+	{basis,Ared,DP[basis]}
+];
+
+(* Extract Q matrix in given bases *)
+ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
+	QStuff = table[
+		Stuff[];
+		Q[t]//GExpand
+	,
+		{t,cur}
+	];
+	QStuff = QStuff/.Times->UnTimes;
+	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
+	If[reducedQStuff==={},
+	{{},{}}
+	,
+	Qmatrix = CoefficientArrays[QStuff,next/.Times->UnTimes][[2]];
+	Qmatrix = Transpose[Qmatrix];
+	Qmatrix
+	]
+];
+
+Clear[H];
+H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
+	(* prev (-1) -> cur (0) -> next (1) *)
+	
+	Do[
+		{basis[i],Ared[i],dp[i]} = GetBasis[charges,degree+i,NN];
+		If[
+			Length[basis[i]]>0
+		,
+			TT[i] = T[basis[i]];
+			M[i] = Transpose[Ared[i]] . TT[i] . Ared[i];
+		];
+		
+		If[i==0,
+			If[Length[basis[-1]]>0
+			,
+				q[i-1] = ActQBasis[basis[i-1],basis[i]];
+				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[-1] = QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
+				h[-1] = Inverse[M[0]] . QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
+			,
+				h[-1] = 0;
+			];
+		];
+		
+		If[i==1,
+			If[Length[basis[1]]>0
+			,
+				q[i-1] = ActQBasis[basis[i-1],basis[i]];
+				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
+				HH[0] = Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
+				h[0] = Inverse[M[0]] . Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
 			,
 				h[0] = 0;
 			];
@@ -634,7 +745,7 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 (*Test *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tao 1.1*)
 
 
@@ -717,7 +828,20 @@ TT[0]//Normal//MatrixForm
 M[0]//Normal//MatrixForm
 
 q[-1]//Normal//MatrixForm
-Q[-1]//Normal//MatrixForm
+QQ[-1]//Normal//MatrixForm
+
+
+tmp1=Q/@(basis[-1] . Ared[-1])//GExpand;
+tmp1=tmp1[[1]]
+tmp2=basis[0] . Ared[0];
+tmp2=-4tmp2[[2]]//Expand
+
+
+(*Ared[0]//MatrixForm
+TT[0]//MatrixForm
+Transpose[Ared[0]].TT[0]//MatrixForm
+q[-1]//MatrixForm
+Ared[-1]//MatrixForm*)
 
 
 (* Manually check Tao's Section 1.2 *)
