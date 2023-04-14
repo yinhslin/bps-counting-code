@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-options = {"-N", "2", "-lmin", "4", "-lmax", "4"};
+options = {"-N", "3", "-lmin", "4", "-lmax", "4"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -58,7 +58,7 @@ juliaDirectory = home <> "julia/";
 miscDirectory = home <> "misc/";
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Count*)
 
 
@@ -226,7 +226,7 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+	(Switch[Count[{a3,a4,a5},1],2,x,1,y,_,1]/.{x->1,y->1})*2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
@@ -240,7 +240,7 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	t1=Tally[l1];
 	t2=Tally[l2];
 	If[t1=!=t2,Return[0]];
-	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
+	Product[t[[2]]!*factor[t[[1,1]]]^(t[[2]]),{t,t1}]
 ];
 
 (* TO DEPRECIATE *)
@@ -533,107 +533,6 @@ AD0[charges_,degree_,NN_] := Eigenvalues[H0[charges,degree,NN]];
 (*Anomalous dimension (TO CHECK)*)
 
 
-(* Basis of monomials *)
-Basis[traces_]:=Module[{Allterms,reducedTraces},
-	reducedTraces=traces/.Times->UnTimes;
-	Allterms=CollectTerms[reducedTraces];
-	Allterms/.UnTimes->Times
-];
-
-(* Row reduction *)
-IndStuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
-	If[traces=={},{{},{}},
-		reducedTraces=traces/.Times->UnTimes;
-		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
-		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
-		SimpVector
-	]
-];
-
-(* Basis and IndStuffBasis together *)
-GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
-	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
-	If[Length[bare]==0,
-		Return[{{},{}}]
-	];
-	basis = Basis[bare];
-	Ared = IndStuffBasis[bare,basis];
-	If[numerical,
-		Ared = {MyNormalize[#]&/@Ared,basis};
-	];
-	Ared = Transpose[Ared];
-	{basis,Ared}
-];
-
-(* Extract Q matrix in given bases *)
-ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
-	QStuff = table[
-		Stuff[];
-		Q[t]//GExpand
-	,
-		{t,cur}
-	];
-	QStuff = QStuff/.Times->UnTimes;
-	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
-	If[reducedQStuff==={},
-	{{},{}}
-	,
-	Qmatrix = CoefficientArrays[QStuff,next/.Times->UnTimes][[2]];
-	Qmatrix = Transpose[Qmatrix];
-	Qmatrix
-	]
-];
-
-Clear[H];
-H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
-	(* prev (-1) -> cur (0) -> next (1) *)
-	
-	Do[
-		{basis[i],Ared[i]} = GetBasis[charges,degree+i,NN];
-		If[
-			Length[basis[i]]>0
-		,
-			TT[i] = T[basis[i]];
-			M[i] = Transpose[Ared[i]] . TT[i] . Ared[i];
-		];
-		
-		If[i==0,
-			If[Length[basis[-1]]>0
-			,
-				q[i-1] = ActQBasis[basis[i-1],basis[i]];
-				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
-				HH[-1] = QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
-				h[-1] = Inverse[M[0]] . QQ[-1] . Inverse[M[-1]] . Transpose[QQ[-1]]/2;
-			,
-				h[-1] = 0;
-			];
-		];
-		
-		If[i==1,
-			If[Length[basis[1]]>0
-			,
-				q[i-1] = ActQBasis[basis[i-1],basis[i]];
-				QQ[i-1] = Transpose[Ared[i]] . TT[i] . q[i-1] . Ared[i-1];
-				HH[0] = Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
-				h[0] = Inverse[M[0]] . Transpose[QQ[0]] . Inverse[M[1]] . QQ[0]/2;
-			,
-				h[0] = 0;
-			];
-		];
-	,
-		{i,-1,1}
-	];
-	
-	h[-1]+h[0]
-];
-
-AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
-
-
-(* ::Subsubsection:: *)
-(*Anomalous dimension dagger (TO CHECK)*)
-
-
 (* dagger *)
 SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
 DaggerPermutation[basis_]:=Module[{dag},
@@ -641,7 +540,6 @@ DaggerPermutation[basis_]:=Module[{dag},
 	CoefficientArrays[dag,basis/.Times->UnTimes][[2]]
 ];
 DP[basis_]:=DaggerPermutation[basis];
-
 
 (* Basis of monomials *)
 Basis[traces_]:=Module[{Allterms,reducedTraces},
@@ -696,7 +594,7 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 ];
 
 Clear[H];
-H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
+H[charges_,degree_,NN_] := Module[{basis,Ared,TT,M,q,QQ,h,HH,dp},
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
@@ -708,6 +606,10 @@ H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
 			M[i] = Transpose[Ared[i]] . TT[i] . Ared[i];
 		];
 		
+		If[i==0,
+			If[Length[basis[0]]==0, Return[{{}}]];
+		];
+
 		If[i==0,
 			If[Length[basis[-1]]>0
 			,
@@ -735,10 +637,16 @@ H[charges_,degree_,NN_] := Module[{(*basis,Ared,TT,M,q,QQ,h,dp*)},
 		{i,-1,1}
 	];
 	
+	If[Length[basis[0]]==0, Return[{{}}]];
 	h[-1]+h[0]
 ];
 
-AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
+AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN]},
+	If[HH==={{}},
+		{},
+		Eigenvalues[HH]
+	]
+];
 
 
 (* ::Section:: *)
@@ -746,7 +654,7 @@ AD[charges_,degree_,NN_] := Eigenvalues[H[charges,degree,NN]];
 
 
 (* ::Subsection::Closed:: *)
-(*Tao 1.1*)
+(*Feng-Tao 1.1*)
 
 
 H[{0,0,1,1,1},3,2]//MatrixForm
@@ -762,7 +670,7 @@ TT[0]//Normal//MatrixForm
 M[0]//Normal//MatrixForm
 
 q[-1]//Normal//MatrixForm
-Q[-1]//Normal//MatrixForm
+QQ[-1]//Normal//MatrixForm
 
 
 (* Manually check Tao's Section 1.2 *)
@@ -811,8 +719,8 @@ Ared[0]//MatrixForm
 tao[0][[2]]//MatrixForm
 
 
-(* ::Subsection:: *)
-(*Tao 1.2*)
+(* ::Subsection::Closed:: *)
+(*Feng-Tao 1.2*)
 
 
 H[{0,0,0,2,2},4,2]//MatrixForm
@@ -829,19 +737,6 @@ M[0]//Normal//MatrixForm
 
 q[-1]//Normal//MatrixForm
 QQ[-1]//Normal//MatrixForm
-
-
-tmp1=Q/@(basis[-1] . Ared[-1])//GExpand;
-tmp1=tmp1[[1]]
-tmp2=basis[0] . Ared[0];
-tmp2=-4tmp2[[2]]//Expand
-
-
-(*Ared[0]//MatrixForm
-TT[0]//MatrixForm
-Transpose[Ared[0]].TT[0]//MatrixForm
-q[-1]//MatrixForm
-Ared[-1]//MatrixForm*)
 
 
 (* Manually check Tao's Section 1.2 *)
@@ -884,7 +779,7 @@ Ared[0]//MatrixForm
 tao[0][[2]]//MatrixForm
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*AD*)
 
 
@@ -892,6 +787,8 @@ AD[{0,0,1,1,1},3,NN]
 AD[{0,0,1,1,1},2,NN]
 AD[{0,0,0,2,2},4,NN]
 H[{0,0,0,2,2},4,NN]//MatrixForm
+AD[{0,0,0,2,3},5,NN]
+H[{0,0,0,2,3},5,NN]//MatrixForm
 
 
 (*
