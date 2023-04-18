@@ -457,7 +457,7 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 		{},
 		Eigenvalues[HH]
 	];
-	Join[{charges . {3,3,2,2,2},charges,degree,NN},{ToString[tmp]}]//Flatten
+	Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten
 ];
 
 
