@@ -49,10 +49,14 @@ home = Switch[user,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
 			,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
-		];
+		]
 	,
 	_,
-		Directory[]<>"/"
+		If[specialQ,
+			Directory[]<>"/bps/"
+			,
+			Directory[]<>"/bps_u/"
+		]
 ];
 
 necklaceDirectory = home <> "necklace/";
@@ -63,7 +67,7 @@ multiGravitonDirectory = home <> "multigraviton/";
 countDirectory = home <> "count/";
 cohomologyDirectory = home <> "cohomology/";
 juliaDirectory = home <> "julia/";
-directories = {necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory};
+directories = {home,necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory};
 
 On[Assert];
 
