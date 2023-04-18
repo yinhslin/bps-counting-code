@@ -35,17 +35,21 @@ If[perm === Null, perm = False, perm = True];
 delete = param["d"];
 If[delete === Null, delete = False, delete = True];
 
-user = $Username
+user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
 			,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
-		];
+		]
 	,
 	_,
-		Directory[]<>"/"
+		If[specialQ,
+			Directory[]<>"/bps/"
+			,
+			Directory[]<>"/bps_u/"
+		]
 ];
 directory = home<>ToLowerCase[type]<>"/";
 

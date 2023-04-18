@@ -4,20 +4,11 @@
 (*Count*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*Multi-trace and Multi-graviton*)
+
+
 minDeg -= 1;
-
-(*ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];*)
-ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{nth1,nth2,nth3}}/.Solve[3 nzn+3 nzp+2 nth1+2 nth2+2 nth3==level,{nzn,nzp,nth1,nth2,nth3},NonNegativeIntegers],{2}]];
-ChargeSet[charges_] := Join[Table[z1,{i,1,charges[[1]]}],Table[z2,{i,1,charges[[2]]}],Table[th1,{i,1,charges[[3]]}],Table[th2,{i,1,charges[[4]]}],Table[th3,{i,1,charges[[5]]}]];
-Charges[chargeSet_] := Table[Count[chargeSet,i],{i,{z1,z2,th1,th2,th3}}];
-MultiTraceChargeSetList[charges_]:=DeleteDuplicates[DeleteCases[SetPartitions[ChargeSet[charges]],_?(Min[Map[Length,#] ]<minDeg  &)]]; 
-MultiTraceChargeList[charges_] := (Charges[#]&/@#)&/@MultiTraceChargeSetList[charges];
-Distri[lis_] := DeleteDuplicates[DeleteCases[If[Length[lis]>1,Outer@@Join[{NonCommutativeMultiply},lis],lis[[1]]],0]];
-MaxDeg[charges_] := Plus@@charges;
-AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
-AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
-
-(* Junk above? *)
 
 MultiTrace[charges_,degree_,NN_] := Module[{level,filename,ans},
 	level = charges . {3,3,2,2,2};
@@ -46,109 +37,67 @@ MultiGraviton[charges_,degree_,NN_] := Module[{level,filename,ans},
 	];
 
 
-(* ::Subsubsection:: *)
-(*Numerical row reduce*)
-
-
-(* ::Text:: *)
-(*Install Julia from https://julialang.org/*)
-(*Install necessary packages by running the following commands within Julia:*)
-(*import(Pkg);*)
-(*Pkg.add(["LinearAlgebra", "SparseArrays", "SuiteSparse", "DelimitedFiles", "DoubleFloats", "MultiFloats", "MatrixMarket", "RowEchelon", "ZChop", "JLD2"]);*)
-
-
-(*dir = NotebookDirectory[];
-dirX = StringReplace[dir,{"("->"\(",")"->"\)","\ "->"\\\ "}];
-julia = "/Applications/Julia-1.6.app/Contents/Resources/julia/bin/julia";
-qr = dirX<>"../../qr.jl";
-(* A must be a sparse matrix *)
-MyRowReduce[A_] := Module[{ans},
-	Export[dir<>"in.mtx",A];
-	(*Print[julia<>" "<>qr<>" Float64 1e-5 "<>dirX<>"in.mtx"<>" "dirX<>"out.mtx"];*)
-	Run[julia<>" "<>qr<>" Float64 1e-5 "<>dirX<>"in.mtx"<>" "<>dirX<>"out.mtx"];
-	ans = Import[dir<>"out.mtx"];
-	DeleteFile[dir<>"in.mtx"];
-	DeleteFile[dir<>"out.mtx"];
-	ans
-];*)
-
-
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Q and Non-commutative multiply*)
 
 
 Stuff[] := Module[{},
-(* index relations *)
-index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^15+a1*2^11+a2*2^7+a3*2^6+a4*2^5+a5*2^4+(i-1)*2^2+(j-1);
-fp[a_]:=Quotient[a,2^15];
-nz1[a_]:=Quotient[Mod[a,2^15],2^11];
-nz2[a_]:=Quotient[Mod[a,2^11],2^7];
-n\[Theta]1[a_]:=Quotient[Mod[a,2^7],2^6];
-n\[Theta]2[a_]:=Quotient[Mod[a,2^6],2^5];
-n\[Theta]3[a_]:=Quotient[Mod[a,2^5],2^4];
-mati[a_]:=Quotient[Mod[a,2^4],2^2]+1;
-matj[a_]:=Mod[a,2^2]+1;
+	(* index relations *)
+	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^15+a1*2^11+a2*2^7+a3*2^6+a4*2^5+a5*2^4+(i-1)*2^2+(j-1);
+	fp[a_]:=Quotient[a,2^15];
+	nz1[a_]:=Quotient[Mod[a,2^15],2^11];
+	nz2[a_]:=Quotient[Mod[a,2^11],2^7];
+	n\[Theta]1[a_]:=Quotient[Mod[a,2^7],2^6];
+	n\[Theta]2[a_]:=Quotient[Mod[a,2^6],2^5];
+	n\[Theta]3[a_]:=Quotient[Mod[a,2^5],2^4];
+	mati[a_]:=Quotient[Mod[a,2^4],2^2]+1;
+	matj[a_]:=Mod[a,2^2]+1;
 
-(* resture default NonCommutativeMultiply *)
-Unprotect[NonCommutativeMultiply];
-ClearAll[NonCommutativeMultiply];
-SetAttributes[NonCommutativeMultiply,Flat];
-SetAttributes[NonCommutativeMultiply,OneIdentity];
-Protect[NonCommutativeMultiply];
+	(* resture default NonCommutativeMultiply *)
+	Unprotect[NonCommutativeMultiply];
+	ClearAll[NonCommutativeMultiply];
+	SetAttributes[NonCommutativeMultiply,Flat];
+	SetAttributes[NonCommutativeMultiply,OneIdentity];
+	Protect[NonCommutativeMultiply];
 
-(* Q action *)
-Q[a_Plus]:=Q[#]&/@a;
-Q[a_Times]:=Module[{alist,sign,A},
-	alist=Apply[List,a];
-	sign=1;A=0;
-	Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->Q[alist[[n]]]]);
-		sign=sign (-1)^Grading[alist[[n]]];
-	,{n,alist//Length}];
-	A
-];
-Q[n_]:=0/;NumericQ[n];
-Q[X[a_]^n_]:=n X[a]^(n-1)Q[X[a]]/;fp[a]==0;
-(*Q[X[a_]**b_]:=Q[X[a]]**b - X[a]**Q[b]/;fp[a]==1;*)
-Q[a_NonCommutativeMultiply]:=Module[{alist,sign,A},
-	alist=Apply[List,a];
-	sign=1;A=0;
-	Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->Q[alist[[n]]]]);
-		sign=sign (-1)^Grading[alist[[n]]];
-	,{n,alist//Length}];
-	A
-];
-Q[X[a_]]:=Module[{g=fp[a],L1=nz1[a],L2=nz2[a],M1=n\[Theta]1[a],M2=n\[Theta]2[a],M3=n\[Theta]3[a],i=mati[a],j=matj[a]},
-	If[g==0,
-		Sum[(-1)^(m1+m2+m3+(M2-m2)m3+(M1-m1)(m2+m3)) 
-			Binomial[L1,l1] Binomial[L2,l2] 
-			Sum[X[index[l1,l2,m1,m2,m3,i,k]]X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
-			,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,0,M3}]
-		,
-		Sum[(-1)^((M2-m2)m3+(M1-m1)(m2+m3)) 
-			Binomial[L1,l1] Binomial[L2,l2] 
-			Sum[X[index[l1,l2,m1,m2,m3,i,k]]**X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
-			,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,Mod[m1+m2,2],M3,2}]
-		+
-		Sum[(-1)^(1+(M2-m2)m3+(M1-m1)(m2+m3)) 
-			Binomial[L1,l1] Binomial[L2,l2] 
-			Sum[X[index[l1,l2,m1,m2,m3,i,k]]X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
-			,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,Mod[m1+m2+1,2],M3,2}]
-	]
-];
-(*Q[X[a_]]:=
-	Sum[(-1)^(m1+m2+m3+(n\[Theta]2[a]-m2)m3+(n\[Theta]1[a]-m1)(m2+m3)) 
-		Binomial[nz1[a],l1] Binomial[nz2[a],l2] 
-		Sum[X[index[l1,l2,m1,m2,m3,mati[a],k]]X[index[nz1[a]-l1,nz2[a]-l2,n\[Theta]1[a]-m1,n\[Theta]2[a]-m2,n\[Theta]3[a]-m3,k,matj[a]]],{k,1,NN}]
-		,{l1,0,nz1[a]},{l2,0,nz2[a]},{m1,0,n\[Theta]1[a]},{m2,0,n\[Theta]2[a]},{m3,0,n\[Theta]3[a]}]/;fp[a]==0;
-Q[X[a_]]:=
-	Sum[(-1)^((n\[Theta]2[a]-m2)m3+(n\[Theta]1[a]-m1)(m2+m3)) 
-		Binomial[nz1[a],l1] Binomial[nz2[a],l2] 
-		Sum[X[index[l1,l2,m1,m2,m3,mati[a],k]]**X[index[nz1[a]-l1,nz2[a]-l2,n\[Theta]1[a]-m1,n\[Theta]2[a]-m2,n\[Theta]3[a]-m3,k,matj[a]]],{k,1,NN}]
-		,{l1,0,nz1[a]},{l2,0,nz2[a]},{m1,0,n\[Theta]1[a]},{m2,0,n\[Theta]2[a]},{m3,Mod[m1+m2,2],n\[Theta]3[a],2}]
-	+Sum[(-1)^(1+(n\[Theta]2[a]-m2)m3+(n\[Theta]1[a]-m1)(m2+m3)) 
-		Binomial[nz1[a],l1] Binomial[nz2[a],l2] 
-		Sum[X[index[l1,l2,m1,m2,m3,mati[a],k]]X[index[nz1[a]-l1,nz2[a]-l2,n\[Theta]1[a]-m1,n\[Theta]2[a]-m2,n\[Theta]3[a]-m3,k,matj[a]]],{k,1,NN}]
-		,{l1,0,nz1[a]},{l2,0,nz2[a]},{m1,0,n\[Theta]1[a]},{m2,0,n\[Theta]2[a]},{m3,Mod[m1+m2+1,2],n\[Theta]3[a],2}]/;fp[a]==1;*)
+	(* Q action *)
+	Q[a_Plus]:=Q[#]&/@a;
+	Q[a_Times]:=Module[{alist,sign,A},
+		alist=Apply[List,a];
+		sign=1;A=0;
+		Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->Q[alist[[n]]]]);
+			sign=sign (-1)^Grading[alist[[n]]];
+		,{n,alist//Length}];
+		A
+	];
+	Q[n_]:=0/;NumericQ[n];
+	Q[X[a_]^n_]:=n X[a]^(n-1)Q[X[a]]/;fp[a]==0;
+	Q[a_NonCommutativeMultiply]:=Module[{alist,sign,A},
+		alist=Apply[List,a];
+		sign=1;A=0;
+		Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->Q[alist[[n]]]]);
+			sign=sign (-1)^Grading[alist[[n]]];
+		,{n,alist//Length}];
+		A
+	];
+	Q[X[a_]]:=Module[{g=fp[a],L1=nz1[a],L2=nz2[a],M1=n\[Theta]1[a],M2=n\[Theta]2[a],M3=n\[Theta]3[a],i=mati[a],j=matj[a]},
+		If[g==0,
+			Sum[(-1)^(m1+m2+m3+(M2-m2)m3+(M1-m1)(m2+m3)) 
+				Binomial[L1,l1] Binomial[L2,l2] 
+				Sum[X[index[l1,l2,m1,m2,m3,i,k]]X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
+				,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,0,M3}]
+			,
+			Sum[(-1)^((M2-m2)m3+(M1-m1)(m2+m3)) 
+				Binomial[L1,l1] Binomial[L2,l2] 
+				Sum[X[index[l1,l2,m1,m2,m3,i,k]]**X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
+				,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,Mod[m1+m2,2],M3,2}]
+			+
+			Sum[(-1)^(1+(M2-m2)m3+(M1-m1)(m2+m3)) 
+				Binomial[L1,l1] Binomial[L2,l2] 
+				Sum[X[index[l1,l2,m1,m2,m3,i,k]]X[index[L1-l1,L2-l2,M1-m1,M2-m2,M3-m3,k,j]],{k,1,NN}]
+				,{l1,0,L1},{l2,0,L2},{m1,0,M1},{m2,0,M2},{m3,Mod[m1+m2+1,2],M3,2}]
+		]
+	];
 
 	(* matrix and product *)
 	If[specialQ,
@@ -184,11 +133,16 @@ Q[X[a_]]:=
 Stuff[];
 
 
-(* ::Subsubsection:: *)
-(*Independence*)
+(* ::Subsubsection::Closed:: *)
+(*Numerical*)
 
 
-CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
+(* ::Text:: *)
+(*Install Julia from https://julialang.org/*)
+(*Install necessary packages by running the following commands within Julia:*)
+(*import(Pkg);*)
+(*Pkg.add(["LinearAlgebra", "SparseArrays", "SuiteSparse", "DelimitedFiles", "DoubleFloats", "MultiFloats", "MatrixMarket", "RowEchelon", "ZChop", "JLD2"]);*)
+
 
 If[numerical,
 	julia = "julia";
@@ -222,6 +176,13 @@ If[numKernels === Null,
 	table = Table,
 	table = ParallelTable
 ];
+
+
+(* ::Subsubsection:: *)
+(*Independence*)
+
+
+CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
 
 (* CM *)
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
