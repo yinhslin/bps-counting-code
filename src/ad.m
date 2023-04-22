@@ -163,7 +163,7 @@ If[numKernels === Null,
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Inner product*)
 
 
@@ -198,7 +198,7 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	(Switch[Count[{a3,a4,a5},1],2,x,1,y,_,1]/.{x->1,y->1})*2^(2a1+2a2+1+4(a3-1)(a4-1)(a5-1))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+	2^(2a1+2a2+1(*+4(a3-1)(a4-1)(a5-1)*))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
@@ -339,7 +339,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension*)
 
 
@@ -455,9 +455,11 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 	tmp = If[HH==={{}},
 		{},
-		Eigenvalues[HH]
+		Eigenvalues[N[HH,20]]
 	];
-	Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten
+	tmp = If[Element[Round[#,10^-5],Integers],Round[#],N[Round[#,10^-5]]]&/@tmp;
+	tmp = Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten;
+	tmp
 ];
 
 
@@ -479,7 +481,7 @@ Exec[] := Module[{},
 				Continue[];
 			];
 			Export[filename,{ad[charges,degree,NN]}];
-			tmp = Import[filename,"CSV"];
+			tmp = Import[filename,"CSV"]//ToExpression;
 			(*Print[ad[charges,degree,NN], " ", tmp[[1]]];*)
 			(*Print["> ", tmp[[1]] === ad[charges,degree,NN]];*)
 			(*If[
@@ -489,6 +491,8 @@ Exec[] := Module[{},
 				Quit[];
 			];*)
 			If[Length[tmp]>0 && tmp[[1]] =!= ad[charges,degree,NN],
+				Print[tmp[[1]]];
+				Print[ad[charges,degree,NN]];
 				DeleteFile[filename];
 			];
 		,
