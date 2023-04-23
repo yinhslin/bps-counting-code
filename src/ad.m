@@ -198,7 +198,7 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	2^(2a1+2a2+1(*+4(a3-1)(a4-1)(a5-1)*))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+	2^(2a1+2a2-4(*+4(a3-1)(a4-1)(a5-1)*))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
@@ -339,7 +339,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension*)
 
 
@@ -425,8 +425,8 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 			,
 				q[-1] = ActQBasis[basis[-1],basis[0]];
 				QQ[-1] = Transpose[Ared[0]] . TT[0] . q[-1] . Ared[-1];
-				HH[-1] = QQ[-1] . invM[-1] . Transpose[QQ[-1]]/2;
-				h[-1] = invM[0] . QQ[-1] . invM[-1] . Transpose[QQ[-1]]/2;
+				HH[-1] = 2 * QQ[-1] . invM[-1] . Transpose[QQ[-1]];
+				h[-1] = 2 * invM[0] . QQ[-1] . invM[-1] . Transpose[QQ[-1]];
 			,
 				h[-1] = SparseArray[{},{dim[0],dim[0]}];
 			];
@@ -437,8 +437,8 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 			,
 				q[0] = ActQBasis[basis[0],basis[1]];
 				QQ[0] = Transpose[Ared[1]] . TT[1] . q[0] . Ared[0];
-				HH[0] = Transpose[QQ[0]] . invM[1] . QQ[0]/2;
-				h[0] = invM[0] . Transpose[QQ[0]] . invM[1] . QQ[0]/2;
+				HH[0] = 2 * Transpose[QQ[0]] . invM[1] . QQ[0];
+				h[0] = 2 * invM[0] . Transpose[QQ[0]] . invM[1] . QQ[0];
 			,
 				h[0] = SparseArray[{},{dim[0],dim[0]}];
 			];
