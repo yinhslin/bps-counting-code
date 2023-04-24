@@ -345,13 +345,13 @@ T[l_]:=Module[{ll,allTerms,matrix},
 (*Anomalous dimension*)
 
 
-(* dagger *)
+(*(* dagger *)
 SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
 DaggerPermutation[basis_]:=Module[{dag},
 	dag=basis/.X[n_]:>X[SwapIJ[n]]/.Times->UnTimes;
 	CoefficientArrays[dag,basis/.Times->UnTimes][[2]]
 ];
-DP[basis_]:=DaggerPermutation[basis];
+DP[basis_]:=DaggerPermutation[basis];*)
 
 (* Basis of monomials *)
 Basis[traces_]:=Module[{Allterms,reducedTraces},
@@ -375,7 +375,7 @@ Clear[GetBasis];
 GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
 	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
 	If[Length[bare]==0,
-		Return[{{},{{}},{}}]
+		Return[{{},{{}}(*,{}*)}]
 	];
 	basis = Basis[bare];
 	Ared = IndStuffBasis[bare,basis];
@@ -383,7 +383,7 @@ GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
 		Ared = {MyNormalize[#]&/@Ared,basis};
 	];
 	Ared = Transpose[Ared];
-	{basis,Ared,DP[basis]}
+	{basis,Ared(*,DP[basis]*)}
 ];
 
 (* Extract Q matrix in given bases *)
@@ -409,7 +409,7 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
-		{basis[i],Ared[i],dp[i]} = GetBasis[charges,degree+i,NN];
+		{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i,NN];
 		dim[i] = Dimensions[Ared[i]][[2]];
 		
 		If[i==0 && dim[0]==0, Break[]];
