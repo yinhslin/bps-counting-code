@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Anomalous dimension*)
 
 
@@ -163,7 +163,7 @@ If[numKernels === Null,
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Inner product*)
 
 
@@ -341,7 +341,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension*)
 
 
@@ -409,7 +409,8 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
-		{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i,NN];
+		Print["p", " ", Timing[{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i,NN]][[1]], " ", i];
+		(*Ared[i] = N[Ared[i]];*)
 		dim[i] = Dimensions[Ared[i]][[2]];
 		
 		If[i==0 && dim[0]==0, Break[]];
@@ -417,18 +418,24 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 		If[
 			Length[basis[i]]>0
 		,
+		Print["T", " ", Timing[
 			TT[i] = T[basis[i]];
+			(*TT[i] = N[TT[i]];*)
 			M[i] = Transpose[Ared[i]] . TT[i] . Ared[i];
 			invM[i] = SparseArray[Inverse[M[i]]];
+			][[1]], " ", i];
 		];
 
 		If[i==-1,
 			If[Length[basis[-1]]>0
 			,
+			Print["-", " ", Timing[
 				q[-1] = ActQBasis[basis[-1],basis[0]];
+				(*q[-1] = N[q[-1]];*)
 				QQ[-1] = Transpose[Ared[0]] . TT[0] . q[-1] . Ared[-1];
 				HH[-1] = 2 * QQ[-1] . invM[-1] . Transpose[QQ[-1]];
 				h[-1] = 2 * invM[0] . QQ[-1] . invM[-1] . Transpose[QQ[-1]];
+			][[1]]];
 			,
 				h[-1] = SparseArray[{},{dim[0],dim[0]}];
 			];
@@ -437,10 +444,13 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 		If[i==1,
 			If[Length[basis[1]]>0
 			,
+			Print["1", " ", Timing[
 				q[0] = ActQBasis[basis[0],basis[1]];
+				(*q[0] = N[q[0]];*)
 				QQ[0] = Transpose[Ared[1]] . TT[1] . q[0] . Ared[0];
 				HH[0] = 2 * Transpose[QQ[0]] . invM[1] . QQ[0];
 				h[0] = 2 * invM[0] . Transpose[QQ[0]] . invM[1] . QQ[0];
+			][[1]]];
 			,
 				h[0] = SparseArray[{},{dim[0],dim[0]}];
 			];
@@ -451,13 +461,13 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 	
 	If[dim[0]==0, Return[{{}}]];
 	
-	h[-1]+h[0]
+	(h[-1]+h[0])/32
 ];
 
 AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 	tmp = If[HH==={{}},
 		{},
-		Eigenvalues[N[HH,20]]
+		Eigenvalues[N[HH]]
 	];
 	tmp = If[Element[Round[#,10^-5],Integers],Round[#],N[Round[#,10^-5]]]&/@tmp;
 	tmp = Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten;
@@ -465,7 +475,7 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 ];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Execute*)
 
 
@@ -475,7 +485,7 @@ Exec[] := Module[{},
 		ClearAll[ad];
 		TimeConstrained[
 			Check[
-				h[charges,degree,NN] = H[charges,degree,NN];
+				Print["h", " ", Timing[h[charges,degree,NN] = H[charges,degree,NN]][[1]]];
 				ad[charges,degree,NN] = AD[charges,degree,NN];
 			,
 				Print["> terminated due to error"];
