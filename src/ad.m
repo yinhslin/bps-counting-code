@@ -198,7 +198,7 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	2^(2a1+2a2-4(*+4(a3-1)(a4-1)(a5-1)*))*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+	2^(1-2a1-2a2)*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
