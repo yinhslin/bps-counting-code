@@ -348,23 +348,23 @@ T[l_]:=Module[{ll,allTerms,matrix},
 (*(* dagger *)
 SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
 DaggerPermutation[basis_]:=Module[{dag},
-	dag=basis/.X[n_]:>X[SwapIJ[n]]/.Times->UnTimes;
-	CoefficientArrays[dag,basis/.Times->UnTimes][[2]]
+	dag=basis/.X[n_]:>X[SwapIJ[n]]//Un;
+	CoefficientArrays[dag,basis//Un][[2]]
 ];
 DP[basis_]:=DaggerPermutation[basis];*)
 
 (* Basis of monomials *)
 Basis[traces_]:=Module[{Allterms,reducedTraces},
-	reducedTraces=traces/.Times->UnTimes;
+	reducedTraces=traces//Un;
 	Allterms=CollectTerms[reducedTraces];
-	Allterms/.UnTimes->Times
+	Allterms//Nu
 ];
 
 (* Row reduction *)
 IndStuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{{},{}},
-		reducedTraces=traces/.Times->UnTimes;
-		CoVector=CoefficientArrays[reducedTraces,basis/.Times->UnTimes][[2]];
+		reducedTraces=traces//Un;
+		CoVector=CoefficientArrays[reducedTraces,basis//Un][[2]];
 		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
 		SparseArray[SimpVector]
 	]
@@ -394,12 +394,12 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	,
 		{t,cur}
 	];
-	QStuff = QStuff/.Times->UnTimes;
+	QStuff = QStuff//Un;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
 	If[reducedQStuff==={},
 	{{},{}}
 	,
-	Qmatrix = CoefficientArrays[QStuff,next/.Times->UnTimes][[2]];
+	Qmatrix = CoefficientArrays[QStuff,next//Un][[2]];
 	Qmatrix = Transpose[Qmatrix];
 	Qmatrix
 	]
