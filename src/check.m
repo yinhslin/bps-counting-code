@@ -96,7 +96,7 @@ Do[
 		cnt += 1;
 		Print["level: ",level,", charges ",cnt,"/",numLevels,": ", charges];
 		maxDeg=Plus@@charges;
-		If[type =!= "count" && type =!= "cohomology"
+		If[type =!= "count" && type =!= "cohomology" && type =!= "ad"
 		,
 		Do[
 			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
@@ -145,8 +145,11 @@ Do[
 						If[type === "count",
 							Assert[Length[tmp]==3];
 						];
-						If[type =!= "cohomology",
+						If[type === "cohomology",
 							Assert[Length[tmp]==10];
+						];
+						If[type === "ad",
+							Assert[Length[tmp]>=8];
 						];
 					,
 					err]==err
