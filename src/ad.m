@@ -480,7 +480,7 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 	tmp = If[HH==={{}},
 		{},
-		Eigenvalues[N[HH]]
+		Eigenvalues[Normal[N[HH]]]
 	];
 	tmp = If[Element[Round[#,10^-5],Integers],Round[#],N[Round[#,10^-5]]]&/@tmp;
 	tmp = Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten;
@@ -488,7 +488,7 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 ];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Execute*)
 
 
