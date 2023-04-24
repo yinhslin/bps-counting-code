@@ -480,6 +480,7 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 
 
 Exec[] := Module[{},
+	Share[];
 	filename = adDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".csv";
 	If[!FileExistsQ[filename],
 		ClearAll[ad];
