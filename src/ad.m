@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Anomalous dimension*)
 
 
@@ -130,10 +130,16 @@ Stuff[];
 
 
 If[numerical,
-	julia = "julia";
-	(*qr = home <> "qr.jl";*)
-	qr = "/n/home07/yhlin/bps/src/qr.jl";
-	qr = StringReplace[StringReplace[qr,{" "->"\ "}],{"("->"\(",")"->"\)","\ "->"\\\ "}];
+	Switch[user,
+		"yhlin", 
+			julia = "julia";
+			qr = "/n/home07/yhlin/bps/src/qr.jl";
+			qr = StringReplace[StringReplace[qr,{" "->"\ "}],{"("->"\(",")"->"\)","\ "->"\\\ "}];
+		,
+		_,
+			julia = "/Applications/Julia-1.6.app/Contents/Resources/julia/bin/julia";
+			qr = Directory[] <> "/qr.jl";
+	];
 	(* A must be a sparse matrix *)
 	MyRowReduce[A_] := Module[{ans,id,dir,dirX},
 		id = ToString[RandomInteger[10^10]];
@@ -341,7 +347,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension*)
 
 
@@ -370,7 +376,14 @@ IndStuffBasis[traces_,basis_]:=Module[{Allterms,reducedTraces,CoVector,SimpVecto
 	]
 ];
 
-Clear[GetBasis];
+MyNormalize[list_] := Module[{fac,rat,den,ans},
+	fac = Select[Abs[list],#>0&];
+	rat = Rationalize[list/Max[fac]];
+	den = LCM@@Denominator[rat];
+	ans = rat*den;
+	ans
+];
+
 (* Basis and IndStuffBasis together *)
 GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
 	bare = DeleteCases[DeleteCases[MultiTrace[charges,degree,NN],0],0.];
@@ -380,7 +393,7 @@ GetBasis[charges_,degree_,NN_]:=Module[{bare,basis,Ared},
 	basis = Basis[bare];
 	Ared = IndStuffBasis[bare,basis];
 	If[numerical,
-		Ared = {MyNormalize[#]&/@Ared,basis};
+		Ared = MyNormalize[#]&/@Ared;
 	];
 	Ared = Transpose[Ared];
 	{basis,Ared(*,DP[basis]*)}
