@@ -326,13 +326,15 @@ CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_
 (* T-matrix for list of polynomials *)
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
+Un[a_]:=a/.Power->UnPower/.Times->UnTimes;
+Nu[a_]:=a/.UnTimes->Times/.UnPower->Power;
 T[l_]:=Module[{ll,allTerms,matrix},
 	ll=l/.X[n_]:>Sub[n];
 	ll=(#/.nc_NonCommutativeMultiply:>Distribute[nc]//Expand)&/@ll;
-	ll=ll/.Times->UnTimes;
+	ll=ll//Un;
 	allTerms = CollectTerms[ll];
 	matrix = CoefficientArrays[ll,allTerms][[2]];
-	allTerms = allTerms/.UnTimes->Times;
+	allTerms = allTerms//Nu;
 	(* TODO: dagger *)
 	(*Print[allTerms];*)
 	matrix . TDiag[allTerms] . Transpose[matrix]
