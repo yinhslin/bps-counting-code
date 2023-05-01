@@ -410,7 +410,8 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	QStuff = QStuff//Un;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
 	If[reducedQStuff==={},
-	{{},{}}
+	SparseArray[{},{Length[cur],Length[next]}]
+	(*{{},{}}*)
 	,
 	Qmatrix = CoefficientArrays[QStuff,next//Un][[2]];
 	Qmatrix = Transpose[Qmatrix];
@@ -422,7 +423,9 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
-		Print["p", " ", Timing[{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i,NN]][[1]], " ", i];
+		Print["p", " ", Timing[
+			{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i,NN];
+		][[1]], " ", i];
 		(*Ared[i] = N[Ared[i]];*)
 		dim[i] = Dimensions[Ared[i]][[2]];
 		
@@ -493,6 +496,8 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 
 
 Exec[] := Module[{},
+	filenameH = hDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".m";
+	filenameHmtx = hDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mtx";
 	filename = adDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".csv";
 	If[!FileExistsQ[filename],
 		Share[];
@@ -506,6 +511,8 @@ Exec[] := Module[{},
 				ResetKernels[];
 				Continue[];
 			];
+			Save[filenameH,h];
+			If[h[charges,degree,NN]=!={{}}, Export[filenameHmtx,h[charges,degree,NN]]];
 			Export[filename,{ad[charges,degree,NN]}];
 			tmp = Import[filename,"CSV"]//ToExpression;
 			(*Print[ad[charges,degree,NN], " ", tmp[[1]]];*)
