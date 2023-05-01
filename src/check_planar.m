@@ -22,7 +22,6 @@ param[flag_] := Module[
 		]
 	];
 
-NN = param["N"] // ToExpression;
 specialQ = param["s"] // ToExpression;
 If[specialQ === Null, specialQ = True];
 minLevel = param["lmin"] // ToExpression;
@@ -99,7 +98,7 @@ Do[
 		If[type =!= "count" && type =!= "cohomology" && type =!= "ad"
 		,
 		Do[
-			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
+			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P.mx";
 			If[!FileExistsQ[filename]
 			,
 				(*Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has no file"];*)
@@ -108,18 +107,14 @@ Do[
 				If[
 					Check[
 						Get[filename];
-						Assert[ValueQ[ToExpression[type][charges,degree,NN]]];
-						Assert[ListQ[ToExpression[type][charges,degree,NN]]];
-						(*Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{XB[__]->0,XF[__]->0}],0]];*)
-						Assert[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]==={}];
-						
-						(*Assert[(ToExpression[type][charges,degree,NN]/.{singleTrace[__]->0,multiTrace[__]->0,SingleTrace[__]->0,MultiTrace[__]->0})=!=0];*)
-						(*Print["> ",ToExpression[type][charges,degree,NN][[1,1]]];*)
+						Assert[ValueQ[ToExpression[type][charges,degree]]];
+						Assert[ListQ[ToExpression[type][charges,degree]]];
+						Assert[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree]/.{X[_]->0}],0]==={}];
 					,
 					err]==err
 				, 
 					Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has error"];
-					Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]];
+					Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree]/.{X[_]->0}],0]];
 					AppendTo[list,{level,cnt,degree}];
 					(* DANGEROUS *)
 					If[delete,
@@ -133,7 +128,7 @@ Do[
 		]
 		,
 		Do[
-			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".csv";
+			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P.csv";
 			If[!FileExistsQ[filename]
 			,
 				(*Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has no file"];*)
