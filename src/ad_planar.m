@@ -1,10 +1,10 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Anomalous dimension*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Multi-trace*)
 
 
@@ -22,7 +22,7 @@ SingleTrace[charges_,degree_] := Module[{level,filename,ans},
 	];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Q and Non-commutative multiply*)
 
 
@@ -60,19 +60,34 @@ Stuff[] := Module[{},
 
 	Grading[ a_Plus ] := Max @@ (Grading /@ (List @@ a));
 	Grading[ a_List ] := Plus @@ (Grading /@ (List @@ a));
+	(*Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));*)
 	Grading[ n_ a_ ]:= Grading[ a ]/;NumericQ[n];
 	Grading[ a_NonCommutativeMultiply ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ _ ] := 0;
 	Grading[ a_X ] := fp[a[[1]]];
-
+	
+	Unprotect[NonCommutativeMultiply];
+	NonCommutativeMultiply[a___,n_ c__,b___]:=n NonCommutativeMultiply[a,c,b]/;NumberQ[n];
+	NonCommutativeMultiply[a__,n_,b__]:= n NonCommutativeMultiply[a,b]/;NumberQ[n];
+	NonCommutativeMultiply[n_,a__]:= n NonCommutativeMultiply[a]/;NumberQ[n];
+	NonCommutativeMultiply[a__,n_]:= n NonCommutativeMultiply[a]/;NumberQ[n];
+	Protect[NonCommutativeMultiply];
+	
 	GExpand[a_, patt___] := Expand[a //. {x_NonCommutativeMultiply :> Distribute[x]}, patt];
-	CyclicOrdering[ a_NonCommutativeMultiply ]:=Module[{aList},
-		aList=List@@a;
-		Last[Sort[Table[(-1)^( Grading[aList[[1;;i]]]*Grading[aList[[(i+1);;]]] ) NonCommutativeMultiply@@RotateLeft[aList,i]
-			,{i,1,Length[aList]}]]]
+	CyclicOrdering[ a_NonCommutativeMultiply ]:=Module[{aList,cyclicList},
+		aList = List@@a;
+		cyclicList = Table[(-1)^( Grading[aList[[1;;i]]]*Grading[aList[[(i+1);;]]] ) NonCommutativeMultiply@@RotateLeft[aList,i]
+			,{i,1,Length[aList]}];
+		If[MemberQ[cyclicList,x_/;MemberQ[cyclicList,-x]],
+			0
+			,
+			Last[Sort[cyclicList]]
+		]
 	];
 	CyclicOrdering[ a_Plus ]:= Plus @@ (CyclicOrdering /@ (List @@ a));
-	CyclicOrdering[ n_ a_ ]:= CyclicOrdering[ a ]/;NumericQ[n];
+	CyclicOrdering[ n_ a_ ]:= n CyclicOrdering[ a ]/;NumericQ[n];
+	CyclicOrdering[ n_ ]:= n/;NumericQ[n];
+	
 ];
 
 Stuff[];
@@ -136,10 +151,7 @@ If[numKernels === Null,
 (* TODO: Can make more efficient by bit shifting *)
 decode[m_]:=Module[{n,a1,a2,a3,a4,a5,i,j},
 	n=m;
-	j=1+Mod[n,2^2];
-	n=Quotient[n-j+1,2^2];
-	i=1+Mod[n,2^2];
-	n=Quotient[n-i+1,2^2];
+	n=Quotient[n,2^4];
 	a5=Mod[n,2^1];
 	n=Quotient[n-a5,2^1];
 	a4=Mod[n,2^1];
@@ -149,22 +161,13 @@ decode[m_]:=Module[{n,a1,a2,a3,a4,a5,i,j},
 	a2=Mod[n,2^4];
 	n=Quotient[n-a2,2^4];
 	a1=Mod[n,2^4];
-	{a1,a2,a3,a4,a5,i,j}
+	{a1,a2,a3,a4,a5}
 ];
 
 (* (3.30) and (3.6-3.8) *)
-factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
-	{a1,a2,a3,a4,a5,i,j}=decode[m];
-	norm=If[i==j && specialQ,
-		Switch[i,
-			1, 2,
-			2, 6,
-			3, 12
-		]
-	,
-		1
-	];
-	2^(1-2a1-2a2)*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+factor[m_]:=Module[{a1,a2,a3,a4,a5},
+	{a1,a2,a3,a4,a5}=decode[m];
+	2^(1-2a1-2a2)*a1!*a2!*(a1+a2+a3+a4+a5-1)!
 ];
 
 (* Inner product of monomials *)
@@ -181,43 +184,7 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	Product[t[[2]]!*factor[t[[1,1]]]^(t[[2]]),{t,t1}]
 ];
 
-(* TO DEPRECIATE *)
-(*IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
-	l1=m1/.NonCommutativeMultiply->Times/.{Power->List,Times->List};
-	If[!ListQ[l1],l1={l1}];
-	l1=Table[If[ListQ[x],Array[(x[[1]])&,{x[[2]]}],x],{x,l1}]//Flatten;
-	l2=m2/.NonCommutativeMultiply->Times/.{Power->List,Times->List};
-	If[!ListQ[l2],l2={l2}];
-	l2=Table[If[ListQ[x],Array[(x[[1]])&,{x[[2]]}],x],{x,l2}]//Flatten;
-	t1=Tally[l1];
-	t2=Tally[l2];
-	If[t1=!=t2,Return[0]];
-	Product[t[[2]]!*factor[t[[1,1]]],{t,t1}]
-];*)
-
-(* TO DEPRECIATE *)
-(* Inner product of polynomials using 2-finger algorithm *)
-(*IP[p1_,p2_]:=Module[{l1,l2,i=1,j=1,ans,comp},
-	l1=p1/.Plus->List;
-	l1=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l1//Sort;
-	l2=p2/.Plus->List;
-	l2=If[NumericQ[#[[1]]],{#[[2]],#[[1]]},{#,1}]&/@l2//Sort;
-	Print[l1];
-	ans = 0;
-	While[i<=Length[l1] && j<=Length[l2],
-		comp = Order[l1[[i]],l2[[j]]];
-		Switch[comp,
-			0, ans+=l1[[i,2]]*l2[[j,2]]*IPmono[l1[[i,1]],l2[[j,1]]]; i+=1; j+=1;,
-			1, i+=1,
-			-1, j+=1
-		];
-	];
-	ans
-];*)
-
-(* Valid for U(N) and SU(2) *)
 (* T-matrix for list of monomials *)
-
 (* original *)
 TDiag[l_]:=Module[{ans},
 	ans=SparseArray[{},{Length[l],Length[l]}];
@@ -229,95 +196,27 @@ TDiag[l_]:=Module[{ans},
 	ans
 ];
 
-(* TODO *)
-(* transpose *)
-(*SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
-TDiag[l_]:=Module[{tp,j,ans},
-	ans=SparseArray[{},{Length[l],Length[l]}];
-	Do[
-		tp=l[[i]]/.X[n_]:>X[SwapIJ[n]]/.-expr_:>expr;
-		j=Position[l,tp][[1,1]];
-		ans[[i,j]]=IPmono[l[[i]],l[[i]]];
-	,
-		{i,1,Length[l]}
-	];
-	ans
-];*)
-
-(* TO DEPRECIATE *)
-(*T[l1_,l2_]:=Module[{i=1,j=1,ans,comp,ord1,ord2,ll1,ll2},
-	(* sort l1, l2 *)
-	ord1 = Ordering[l1];
-	ll1 = l1[[ord1]];
-	ord2 = Ordering[l2];
-	ll2 = l2[[ord2]];
-	ans = SparseArray[{},{Length[l1],Length[l2]}];
-	While[i<=Length[l1] && j<=Length[l2],
-		comp = Order[ll1[[i]],ll2[[j]]];
-		Switch[comp,
-			0, ans[[ord1[[i]],ord2[[j]]]]=IPmono[ll1[[i]],ll2[[j]]]; i+=1; j+=1;,
-			1, i+=1,
-			-1, j+=1
-		];
-	];
-	ans
-];*)
-
-(* (3.6-3.8) *)
-SetIJ[n_,i_,j_]:=2^4*Quotient[n,2^4]+(i-1)*2^2+(j-1);
-Sub[n_]:=Module[{i,j},
-	{i,j}={mati[n],matj[n]};
-	If[i==j,
-		Switch[NN,
-			3,
-				Switch[i,
-					1, -X[n]+X[SetIJ[n,2,2]],
-					2, X[SetIJ[n,1,1]]+X[n]
-				],
-			4,
-				Switch[i,
-					1, -X[n]-X[SetIJ[n,2,2]]+X[SetIJ[n,3,3]],
-					2, 2X[n]+X[SetIJ[n,3,3]],
-					3, X[SetIJ[n,1,1]]-X[SetIJ[n,2,2]]+X[n]
-				]
-		]
-	,
-		X[n]
-	]
-]/;specialQ&&NN>2;
-Sub[n_]:=X[n]/;!specialQ||NN==2;
-
 CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
 
 (* T-matrix for list of polynomials *)
-UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
-UnTimes[a_]:=a;
-Un[a_]:=a/.Power->UnPower/.Times->UnTimes;
-Nu[a_]:=a/.UnTimes->Times/.UnPower->Power;
+(*UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
+UnTimes[a_]:=a;*)
+Un[a_]:=a(*/.Power->UnPower/.Times->UnTimes*);
+Nu[a_]:=a(*/.UnTimes->Times/.UnPower->Power*);
 T[l_]:=Module[{ll,allTerms,matrix},
-	ll=l/.X[n_]:>Sub[n];
+	ll=l(*/.X[n_]:>Sub[n]*);
 	ll=(#/.nc_NonCommutativeMultiply:>Distribute[nc]//Expand)&/@ll;
 	ll=ll//Un;
 	allTerms = CollectTerms[ll];
 	matrix = CoefficientArrays[ll,allTerms][[2]];
 	allTerms = allTerms//Nu;
-	(* TODO: dagger *)
-	(*Print[allTerms];*)
 	matrix . TDiag[allTerms] . Transpose[matrix]
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension*)
 
-
-(*(* dagger *)
-SwapIJ[n_]:=2^4*Quotient[n,2^4]+(matj[n]-1)*2^2+(mati[n]-1);
-DaggerPermutation[basis_]:=Module[{dag},
-	dag=basis/.X[n_]:>X[SwapIJ[n]]//Un;
-	CoefficientArrays[dag,basis//Un][[2]]
-];
-DP[basis_]:=DaggerPermutation[basis];*)
 
 (* Basis of monomials *)
 Basis[traces_]:=Module[{Allterms,reducedTraces},
@@ -363,7 +262,7 @@ GetBasis[charges_,degree_]:=Module[{bare,basis,Ared},
 ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	QStuff = table[
 		Stuff[];
-		Q[t]//GExpand
+		Q[t]//GExpand//CyclicOrdering
 	,
 		{t,cur}
 	];
@@ -468,14 +367,6 @@ Exec[] := Module[{},
 			];
 			Export[filename,{ad[charges,degree]}];
 			tmp = Import[filename,"CSV"]//ToExpression;
-			(*Print[ad[charges,degree,NN], " ", tmp[[1]]];*)
-			(*Print["> ", tmp[[1]] === ad[charges,degree,NN]];*)
-			(*If[
-				tmp[[1]] =!= ad[charges,degree,NN]
-				,
-				Print["PROBLEM!"];
-				Quit[];
-			];*)
 			If[Length[tmp]>0 && tmp[[1]] =!= ad[charges,degree],
 				Print[tmp[[1]]];
 				Print[ad[charges,degree]];
