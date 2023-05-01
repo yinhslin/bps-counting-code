@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Anomalous dimension*)
 
 
@@ -144,7 +144,7 @@ If[numKernels === Null,
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Inner product*)
 
 
@@ -186,10 +186,25 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 
 (* T-matrix for list of monomials *)
 (* original *)
-TDiag[l_]:=Module[{ans},
+(*TDiag[l_]:=Module[{ans},
 	ans=SparseArray[{},{Length[l],Length[l]}];
 	Do[
 		ans[[i,i]]=IPmono[l[[i]],l[[i]]]
+	,
+		{i,1,Length[l]}
+	];
+	ans
+];*)
+SymmetryFactor[list_]:=Module[{cyc},
+	(*cyc=Table[Permute[list,c],{c,GroupElements[CyclicGroup[Length[list]]]}];*)
+	cyc=Permute[list,CyclicGroup[Length[list]]];
+	Length[cyc]/Length[DeleteDuplicates[cyc]]
+];
+TDiag[l_]:=Module[{ans,factors},
+	ans=SparseArray[{},{Length[l],Length[l]}];
+	Do[
+		factors=List@@(l[[i]]);
+		ans[[i,i]]=SymmetryFactor[factors]*Product[factor[f[[1]]],{f,factors}];
 	,
 		{i,1,Length[l]}
 	];
