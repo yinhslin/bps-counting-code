@@ -92,8 +92,32 @@ SingleNecklaces[singleTraceCharge_,degree_] := Module[{level,filename,ans},
 
 Stuff[] := Module[{},
 	index[a1_,a2_,a3_,a4_,a5_]:=Mod[a3+a4+a5+1,2]*2^15+a1*2^11+a2*2^7+a3*2^6+a4*2^5+a5*2^4;
+	fp[a_]:=Quotient[a,2^15];
 	X[a_]:=0/;Quotient[a,2^5]==2^10;
-	MonoCharge[singleTrace_] := NonCommutativeMultiply@@( X[index[#[[1]],#[[2]],#[[3]],#[[4]],#[[5]]]] &/@ singleTrace);
+	
+	Grading[ a_Plus ] := Max @@ (Grading /@ (List @@ a));
+	Grading[ a_List ] := Plus @@ (Grading /@ (List @@ a));
+	(*Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));*)
+	Grading[ n_ a_ ]:= Grading[ a ]/;NumericQ[n];
+	Grading[ a_NonCommutativeMultiply ] := Plus @@ (Grading /@ (List @@ a));
+	Grading[ _ ] := 0;
+	Grading[ a_X ] := fp[a[[1]]];
+	
+	CyclicOrdering[ a_NonCommutativeMultiply ]:=Module[{aList,cyclicList},
+		aList = List@@a;
+		cyclicList = Table[(-1)^( Grading[aList[[1;;i]]]*Grading[aList[[(i+1);;]]] ) NonCommutativeMultiply@@RotateLeft[aList,i]
+			,{i,1,Length[aList]}];
+		If[MemberQ[cyclicList,x_/;MemberQ[cyclicList,-x]],
+			0
+			,
+			Last[Sort[cyclicList]]
+		]
+	];
+	CyclicOrdering[ a_Plus ]:= Plus @@ (CyclicOrdering /@ (List @@ a));
+	CyclicOrdering[ n_ a_ ]:= n CyclicOrdering[ a ]/;NumericQ[n];
+	CyclicOrdering[ n_ ]:= n/;NumericQ[n];	
+	
+	MonoCharge[singleTrace_] := NonCommutativeMultiply@@( X[index[#[[1]],#[[2]],#[[3]],#[[4]],#[[5]]]] &/@ singleTrace)//CyclicOrdering;
 ];
 
 Stuff[];
@@ -156,7 +180,7 @@ SingleTrace[singleTraceCharge_,degree_,filename_] := Module[{sn,ans,cnt,tmp,tot,
 
 
 Exec[] := Module[{},
-	fn = singleDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree];
+	fn = singleDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P";
 	filename = fn <> ".mx";
 	If[!FileExistsQ[filename],
 		ClearAll[singleTrace];
