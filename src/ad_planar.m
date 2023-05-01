@@ -144,7 +144,7 @@ If[numKernels === Null,
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Inner product*)
 
 
@@ -195,10 +195,21 @@ IPmono[m1_,m2_]:=Module[{l1,l2,t1,t2},
 	];
 	ans
 ];*)
+(*Quiet[<<Combinatorica`];
 SymmetryFactor[list_]:=Module[{cyc},
-	(*cyc=Table[Permute[list,c],{c,GroupElements[CyclicGroup[Length[list]]]}];*)
 	cyc=Permute[list,CyclicGroup[Length[list]]];
 	Length[cyc]/Length[DeleteDuplicates[cyc]]
+];*)
+SymmetryFactor[list_]:=Module[{tmp,cnt=1},
+	tmp=list;
+	Do[
+		tmp=Join[tmp[[2;;]],{tmp[[1]]}];
+		If[tmp===list,Break[]];
+		cnt+=1
+	,
+		{i,1,Length[list]-1}
+	];
+	Length[list]/cnt
 ];
 TDiag[l_]:=Module[{ans,factors},
 	ans=SparseArray[{},{Length[l],Length[l]}];
@@ -229,7 +240,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension*)
 
 
@@ -284,7 +295,8 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	QStuff = QStuff//Un;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
 	If[reducedQStuff==={},
-	{{},{}}
+	SparseArray[{},{Length[cur],Length[next]}]
+	(*{{},{}}*)
 	,
 	Qmatrix = CoefficientArrays[QStuff,next//Un][[2]];
 	Qmatrix = Transpose[Qmatrix];
@@ -296,7 +308,9 @@ H[charges_,degree_] := H[charges,degree] = Module[{basis,Ared,TT,M,invM,q,QQ,h,H
 	(* prev (-1) -> cur (0) -> next (1) *)
 	
 	Do[
-		Print["p", " ", Timing[{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i]][[1]], " ", i];
+		Print["p", " ", Timing[
+			{basis[i],Ared[i](*,dp[i]*)} = GetBasis[charges,degree+i];
+		][[1]], " ", i];
 		(*Ared[i] = N[Ared[i]];*)
 		dim[i] = Dimensions[Ared[i]][[2]];
 		
@@ -367,10 +381,12 @@ AD[charges_,degree_] := Module[{HH=H[charges,degree],tmp},
 
 
 Exec[] := Module[{},
+	filenameH = hDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P"<>".m";
+	filenameHmtx = hDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P"<>".mtx";
 	filename = adDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P"<>".csv";
 	If[!FileExistsQ[filename],
 		Share[];
-		ClearAll[ad];
+		ClearAll[h,ad];
 		TimeConstrained[
 			Check[
 				Print["h", " ", Timing[h[charges,degree] = H[charges,degree]][[1]]];
@@ -380,6 +396,8 @@ Exec[] := Module[{},
 				ResetKernels[];
 				Continue[];
 			];
+			Save[filenameH,h];
+			If[h[charges,degree]=!={{}}, Export[filenameHmtx,h[charges,degree]]];
 			Export[filename,{ad[charges,degree]}];
 			tmp = Import[filename,"CSV"]//ToExpression;
 			If[Length[tmp]>0 && tmp[[1]] =!= ad[charges,degree],
