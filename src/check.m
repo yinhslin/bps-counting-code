@@ -23,6 +23,7 @@ param[flag_] := Module[
 	];
 
 NN = param["N"] // ToExpression;
+If[NN === 0 || NN === Null, NN = "P"];
 specialQ = param["s"] // ToExpression;
 If[specialQ === Null, specialQ = True];
 minLevel = param["lmin"] // ToExpression;
