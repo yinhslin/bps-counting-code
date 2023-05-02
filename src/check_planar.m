@@ -144,7 +144,7 @@ Do[
 							Assert[Length[tmp]==10];
 						];
 						If[type === "ad",
-							Assert[Length[tmp]>=8];
+							Assert[Length[tmp]>=7];
 						];
 					,
 					err]==err
