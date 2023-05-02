@@ -240,7 +240,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Anomalous dimension*)
 
 
@@ -295,7 +295,7 @@ ActQBasis[cur_,next_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms,t},
 	QStuff = QStuff//Un;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.];
 	If[reducedQStuff==={},
-	SparseArray[{},{Length[cur],Length[next]}]
+	SparseArray[{},{Length[next],Length[cur]}]
 	(*{{},{}}*)
 	,
 	Qmatrix = CoefficientArrays[QStuff,next//Un][[2]];
