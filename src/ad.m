@@ -169,7 +169,7 @@ If[numKernels === Null,
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Inner product*)
 
 
@@ -204,7 +204,7 @@ factor[m_]:=Module[{a1,a2,a3,a4,a5,i,j,norm},
 	,
 		1
 	];
-	2^(1-2a1-2a2)*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
+	2^(-4-2a1-2a2)*a1!*a2!*(a1+a2+a3+a4+a5-1)!/norm
 ];
 
 (* Inner product of monomials *)
@@ -347,7 +347,7 @@ T[l_]:=Module[{ll,allTerms,matrix},
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Anomalous dimension*)
 
 
@@ -477,7 +477,7 @@ H[charges_,degree_,NN_] := H[charges,degree,NN] = Module[{basis,Ared,TT,M,invM,q
 	
 	If[dim[0]==0, Return[{{}}]];
 	
-	(h[-1]+h[0])/32
+	(h[-1]+h[0])
 ];
 
 AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
