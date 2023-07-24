@@ -70,11 +70,11 @@ DistriCharges[tmp_] := Module[{lis = {},x},
 
 MultiGravitonChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/minDeg}];
 
-MaxDeg[charges_] := Plus@@charges;
+MaxDeg[charges_,N_] := Min[Plus@@charges,N];
 
-AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+AllDegs[charges_,N_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#,N]&/@charges)]//Flatten)/.f[x___]:>{x};
 
-AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
+AllDegs[charges_,N_,degree_] := Select[AllDegs[charges,N],Total[#]==degree&];
 
 SingleGraviton[charges_,degree_,NN_] := Module[{level,filename},
 	level = charges . {3,3,2,2,2};
@@ -113,7 +113,7 @@ MultiGraviton[multiGravitonCharge_,degree_,NN_] := Table[Distri[
 		SingleGraviton[multiGravitonCharge[[i]],deg[[i]],NN]
 	,
 		{i,1,Length[multiGravitonCharge]}
-	]] //.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand,{deg,AllDegs[multiGravitonCharge,degree]}] // Flatten;
+	]] //.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand,{deg,AllDegs[multiGravitonCharge,NN,degree]}] // Flatten;
 
 
 (* ::Section:: *)
