@@ -81,7 +81,7 @@ Stuff[] := Module[{},
 Stuff[];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Numerical*)
 
 
@@ -135,15 +135,6 @@ CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_
 (* CM *)
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
-IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
-	If[traces=={},{{},{}},
-		reducedTraces=traces/.Times->UnTimes;
-		Allterms=CollectTerms[reducedTraces];
-		CoVector=CoefficientArrays[reducedTraces,Allterms][[2]];
-		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
-		{SimpVector , Allterms/.UnTimes->Times}
-	]
-];
 
 MyNormalize[list_] := Module[{fac,rat,den,ans},
 	fac = Select[Abs[list],#>0&];
@@ -153,14 +144,18 @@ MyNormalize[list_] := Module[{fac,rat,den,ans},
 	ans
 ];
 
-CountGrav[charges_,degree_,NN_] := Module[{bare,ind,Qbare,Qind,grav,Allterms,SimpQVector,gravCoVector,SimpVector},
+CountGrav[charges_,degree_,NN_] := Module[{grav,Allterms,gravCoVector,SimpVector},
 	grav = DeleteCases[DeleteCases[MultiGraviton[charges,degree+1,NN],0],0.];
 	grav = grav/.Times->UnTimes;
 	If[grav=={},
-		Return[Flatten[ {(*charges, degree, NN,*) Length[ind[[1]]]-Length[Qind[[1]]], Length[Qind[[1]]], 0} ]]
+		Return[ {0} ]
 	];
-	Allterms = DeleteDuplicates[CollectTerms[grav]/.UnTimes->Times]/.Times->UnTimes;
-	gravCoVector = CoefficientArrays[grav,Allterms][[2]];
+	Allterms = DeleteDuplicates[CollectTerms[grav]/.UnTimes->Times]/.Times->UnTimes;	
+	If[Length[Allterms]==1,
+		gravCoVector = SparseArray[({grav/Allterms[[1]]})//Transpose];
+		,
+		gravCoVector = CoefficientArrays[grav,Allterms][[2]];
+		];
 	SimpVector = DeleteCases[gravCoVector//MyRowReduce,Table[0,Length[gravCoVector[[1]]]]];
 	(* END TODO *)
 	
