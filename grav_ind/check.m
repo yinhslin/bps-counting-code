@@ -112,7 +112,11 @@ Do[
 	Do[
 		cnt += 1;
 		Print["level: ",level,", charges ",cnt,"/",numLevels,": ", charges];
-		maxDeg=Plus@@charges;
+		If[type=="singleGraviton",
+			maxDeg=NN;
+			,
+			maxDeg=Plus@@charges;
+		];
 		If[type =!= "count" && type =!= "cohomology" && type =!= "ad"
 		,
 		Do[
