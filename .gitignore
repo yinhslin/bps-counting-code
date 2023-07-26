@@ -25,3 +25,4 @@ Manifest.toml
 
 src/*/
 *_local.m
+grav_ind/*/

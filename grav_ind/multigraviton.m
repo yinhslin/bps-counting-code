@@ -77,7 +77,7 @@ AllDegs[charges_,N_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#,N]&/@charge
 AllDegs[charges_,N_,degree_] := Select[AllDegs[charges,N],Total[#]==degree&];
 
 SingleGraviton[charges_,degree_,NN_] := Module[{level,filename},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = singleGravitonDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
 	Check[
 		Get[filename];
