@@ -24,7 +24,7 @@ MultiGraviton[charges_,degree_,NN_] := Module[{level,filename,ans},
 	];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Non-commutative multiply*)
 
 
@@ -145,7 +145,7 @@ MyNormalize[list_] := Module[{fac,rat,den,ans},
 ];
 
 CountGrav[charges_,degree_,NN_] := Module[{grav,Allterms,gravCoVector,SimpVector},
-	grav = DeleteCases[DeleteCases[MultiGraviton[charges,degree+1,NN],0],0.];
+	grav = DeleteCases[DeleteCases[MultiGraviton[charges,degree,NN],0],0.];
 	grav = grav/.Times->UnTimes;
 	If[grav=={},
 		Return[ {0} ]
@@ -158,7 +158,6 @@ CountGrav[charges_,degree_,NN_] := Module[{grav,Allterms,gravCoVector,SimpVector
 		];
 	SimpVector = DeleteCases[gravCoVector//MyRowReduce,Table[0,Length[gravCoVector[[1]]]]];
 	(* END TODO *)
-	
 	Flatten[ {(*charges, degree, NN,*) Length[SimpVector] } ]
 ];
 (* CM *)

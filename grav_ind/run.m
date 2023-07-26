@@ -60,17 +60,13 @@ home = Switch[user,
 		]
 ];
 
-necklaceDirectory = home <> "necklace/";
-singleDirectory = home <> "singletrace/";
-multiDirectory = home <> "multitrace/";
 singleGravitonDirectory = home <> "singlegraviton/";
 multiGravitonDirectory = home <> "multigraviton/";
 countDirectory = home <> "count/";
 cohomologyDirectory = home <> "cohomology/";
 juliaDirectory = home <> "julia/";
 hDirectory = home <> "h/";
-adDirectory = home <> "ad/";
-directories = {home,necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,hDirectory,adDirectory};
+directories = {home,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory};
 
 On[Assert];
 
@@ -158,7 +154,11 @@ t = Timing[
 		Do[
 			cnt += 1;
 			Print["level ",level,", charges ",cnt,"/",numLevels,": ", charges];
-			maxDeg=Plus@@charges;
+			If[job=="singlegraviton",
+				maxDeg=NN;
+				,
+				maxDeg=Plus@@charges;
+			];
 			Do[
 				Print["level ",level,", charges ",cnt,"/",numLevels,": ",charges,", degree ",degree,"/",maxDeg];
 				Exec[];
