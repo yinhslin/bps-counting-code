@@ -49,9 +49,9 @@ user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/grav/"
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/grav/"
 		]
 	,
 	_,
