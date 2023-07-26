@@ -124,7 +124,7 @@ Do[
 			If[!FileExistsQ[filename]
 			,
 				(*Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has no file"];*)
-				AppendTo[list,{level,cnt,degree}];
+				(*AppendTo[list,{level,cnt,degree}];*)
 			,
 				If[
 					Check[
@@ -139,6 +139,7 @@ Do[
 					,
 					err]==err
 				, 
+					Print["XX"];
 					Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has error"];
 					Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]];
 					AppendTo[list,{level,cnt,degree}];
