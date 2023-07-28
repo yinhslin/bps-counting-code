@@ -41,9 +41,9 @@ user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/grav/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"grav/","grav16/"]
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/grav/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"grav/","grav16/"]
 		]
 	,
 	_,
@@ -123,8 +123,8 @@ Do[
 			filename = directory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
 			If[!FileExistsQ[filename]
 			,
-				(*Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has no file"];*)
-				(*AppendTo[list,{level,cnt,degree}];*)
+				Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has no file"];
+				AppendTo[list,{level,cnt,degree}];
 			,
 				If[
 					Check[
@@ -139,7 +139,6 @@ Do[
 					,
 					err]==err
 				, 
-					Print["XX"];
 					Print["charges ",cnt,"/",numLevels,": ", charges, " degree ", degree, " has error"];
 					Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]];
 					AppendTo[list,{level,cnt,degree}];
