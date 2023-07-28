@@ -15,6 +15,6 @@ SnChar := function(n, NN)
 		PrintTo(JoinStringsWithSeparator(["/Users/yinhslin/git/bps-counting-code/index/sn/", n, "_", N, ".m"], ""), ans);;
 	od;
 end;;
-for n in [1..30] do
+for n in [31..40] do
 	SnChar(n, 10);;
 od;
