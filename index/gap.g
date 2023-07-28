@@ -12,9 +12,9 @@ SnChar := function(n, NN)
 		ans := String(ans);;
 		ans := ReplacedString(ans, "[", "{");;
 		ans := ReplacedString(ans, "]", "}");;
-		PrintTo(JoinStringsWithSeparator(["/Users/yinhslin/git/bps-counting-code/index/sn/", n, "_", N, ".m"], ""), ans);;
+		PrintTo(JoinStringsWithSeparator(["~/bps/index/sn/", n, "_", N, ".m"], ""), ans);;
 	od;
 end;;
-for n in [31..40] do
+for n in [38..40] do
 	SnChar(n, 10);;
 od;
