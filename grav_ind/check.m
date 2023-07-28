@@ -164,10 +164,10 @@ Do[
 					Check[
 						tmp = Import[filename][[1]];
 						If[type === "count",
-							Assert[Length[tmp]==3];
+							Assert[Length[tmp]==1];
 						];
 						If[type === "cohomology",
-							Assert[Length[tmp]==10];
+							Assert[Length[tmp]==9];
 						];
 						If[type === "ad",
 							Assert[Length[tmp]>=8];
