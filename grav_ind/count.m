@@ -95,7 +95,7 @@ Stuff[];
 If[numerical,
 	julia = "julia";
 	(*qr = home <> "qr.jl";*)
-	qr = "/n/home07/yhlin/bps/qr.jl";
+	qr = "/n/home07/yhlin/bps/src/qr.jl";
 	qr = StringReplace[StringReplace[qr,{" "->"\ "}],{"("->"\(",")"->"\)","\ "->"\\\ "}];
 	(* A must be a sparse matrix *)
 	MyRowReduce[A_] := Module[{ans,id,dir,dirX},
