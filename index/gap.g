@@ -15,6 +15,6 @@ SnChar := function(n, NN)
 		PrintTo(JoinStringsWithSeparator(["~/bps/index/sn/", n, "_", N, ".m"], ""), ans);;
 	od;
 end;;
-for n in [41..50] do
+for n in [46..50] do
 	SnChar(n, 10);;
 od;
