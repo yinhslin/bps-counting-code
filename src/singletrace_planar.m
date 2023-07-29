@@ -59,7 +59,7 @@ ComputeSingleNecklaces[singleTraceCharge_,degree_] := Module[{seeds,distri,res},
 ];
 
 SingleNecklaces[singleTraceCharge_,degree_] := Module[{level,filename,ans},
-	level = singleTraceCharge . {3,3,2,2,2};
+	level = singleTraceCharge . levelvector;
 	filename = necklaceDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@singleTraceCharge,"_"]<>"_"<>ToString[degree]<>".mx";
 	If[FileExistsQ[filename],
 	Check[

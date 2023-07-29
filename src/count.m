@@ -11,7 +11,7 @@
 minDeg -= 1;
 
 MultiTrace[charges_,degree_,NN_] := Module[{level,filename,ans},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = multiDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
 	If[FileExistsQ[filename],
 		Get[filename];
@@ -24,7 +24,7 @@ MultiTrace[charges_,degree_,NN_] := Module[{level,filename,ans},
 	];
 	
 MultiGraviton[charges_,degree_,NN_] := Module[{level,filename,ans},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = multiGravitonDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
 	If[FileExistsQ[filename],
 		Get[filename];

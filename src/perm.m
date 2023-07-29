@@ -47,11 +47,15 @@ Stuff[] := Module[{},
 	};
 	GExpandRule = {x_NonCommutativeMultiply :> Distribute[x]};
 
-	ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
 	MaxDeg[charges_] := Plus@@charges;
-	PermCharges[perm1_,perm2_,charges_] := Join[Permute[charges,perm1],Permute[charges[[3;;5]],perm2]];
-	Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[2]},{perm2,SymmetricGroup[3]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
-	(*PermCharges[charges_] := Flatten[Table[Join[c[[1;;2]],Permute[c[[3;;5]],g]],{c,Permute[charges,#]&/@SymmetricGroup[2]},{g,SymmetricGroup[3]}],1]//DeleteDuplicates//DeleteCases[#,charges]&;*)
+	If[schurQ,
+		PermCharges[perm1_,perm2_,charges_] := Join[charges[[1;;3]],Permute[charges[[4;;5]],perm2]];
+		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[1]},{perm2,SymmetricGroup[2]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
+	,
+		PermCharges[perm1_,perm2_,charges_] := Join[Permute[charges,perm1],Permute[charges[[3;;5]],perm2]];
+		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[2]},{perm2,SymmetricGroup[3]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
+		(*PermCharges[charges_] := Flatten[Table[Join[c[[1;;2]],Permute[c[[3;;5]],g]],{c,Permute[charges,#]&/@SymmetricGroup[2]},{g,SymmetricGroup[3]}],1]//DeleteDuplicates//DeleteCases[#,charges]&;*)
+	];
 
 	Perm[seed_,perm_] := Module[{ans,repl,repl0},
 		If[Length[seed]>0,

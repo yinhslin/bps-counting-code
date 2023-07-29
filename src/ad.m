@@ -9,7 +9,7 @@
 
 
 MultiTrace[charges_,degree_,NN_] := Module[{level,filename,ans},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = multiDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".mx";
 	If[FileExistsQ[filename],
 		Get[filename];
@@ -486,7 +486,7 @@ AD[charges_,degree_,NN_] := Module[{HH=H[charges,degree,NN],tmp},
 		Eigenvalues[Normal[N[HH]]]
 	];
 	tmp = If[Element[Round[#,10^-5],Integers],Round[#],N[Round[#,10^-5]]]&/@tmp;
-	tmp = Join[{charges . {3,3,2,2,2},charges,degree,NN},tmp]//Flatten;
+	tmp = Join[{charges . levelvector,charges,degree,NN},tmp]//Flatten;
 	tmp
 ];
 

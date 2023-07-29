@@ -5,7 +5,7 @@
 
 
 CountQ[charges_,degree_] := Module[{level,filename},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = countDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P"<>".csv";
 	If[FileExistsQ[filename],
 		Import[filename][[1]]
@@ -14,17 +14,17 @@ CountQ[charges_,degree_] := Module[{level,filename},
 		Null
 	]
 ];
-Cohomology[charges_,degree_] := {charges . {3,3,2,2,2},charges,degree,CountQ[charges,degree][[1]]-CountQ[charges,degree-1][[2]]}//Flatten;
+Cohomology[charges_,degree_] := {charges . levelvector,charges,degree,CountQ[charges,degree][[1]]-CountQ[charges,degree-1][[2]]}//Flatten;
 Cohomology[charges_,degree_] := Module[{count1 = CountQ[charges,degree], count2 = CountQ[charges,degree-1]},
 	If[count1 =!= Null && count2 =!= Null,
-		{charges . {3,3,2,2,2},charges,degree,count1[[1]]-count2[[2]]}//Flatten
+		{charges . levelvector,charges,degree,count1[[1]]-count2[[2]]}//Flatten
 	,
 		Null
 	]
 ];
 
 (*CountQ[charges_,degree_,NN_] := Module[{level,filename},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = countDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN]<>".csv";
 	If[FileExistsQ[filename],
 		Import[filename][[1]]
@@ -32,7 +32,7 @@ Cohomology[charges_,degree_] := Module[{count1 = CountQ[charges,degree], count2 
 		{0,0}
 	]
 ];
-Cohomology[charges_,degree_,NN_] := {charges . {3,3,2,2,2},charges,degree,NN,CountQ[charges,degree,NN][[1]]-CountQ[charges,degree-1,NN][[2]]}//Flatten;*)
+Cohomology[charges_,degree_,NN_] := {charges . levelvector,charges,degree,NN,CountQ[charges,degree,NN][[1]]-CountQ[charges,degree-1,NN][[2]]}//Flatten;*)
 
 
 (* ::Section:: *)

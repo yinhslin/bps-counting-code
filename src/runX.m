@@ -39,22 +39,24 @@ numerical = param["n"] // ToExpression;
 If[numerical === Null, numerical = False, numerical = True];
 chunk = param["c"] // ToExpression;
 If[chunk === Null, chunk = 10^3];
+schurQ = param["sch"] // ToExpression;
+If[schurQ === Null, schurQ = False, schurQ = True];
 
 
 user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"schur/",""]
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"schur/",""]
 		]
 	,
 	_,
 		If[specialQ,
-			Directory[]<>"/bps/"
+			Directory[]<>"/bps/"<>If[schurQ,"schur/",""]
 			,
-			Directory[]<>"/bps_u/"
+			Directory[]<>"/bps_u/"<>If[schurQ,"schur/",""]
 		]
 ];
 
@@ -83,10 +85,20 @@ If[specialQ,
 	minDeg=1;
 ];
 
-If[perm === False,
-	ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
-,
-	ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
+If[schurQ,
+	If[perm === False,
+		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[2 nz+n\[Theta]1+n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
+		,
+		ChargeList[level_] := {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[2 nz+n\[Theta]1+n\[Theta]2 == level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
+	];
+	levelvector={0,2,0,1,1};
+	,
+	If[perm === False,
+		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
+		,
+		ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
+	];
+	levelvector={3,3,2,2,2};
 ];
 
 If[numKernels === Null, table=Table; do=Do;, table=ParallelTable; do=ParallelDo;];

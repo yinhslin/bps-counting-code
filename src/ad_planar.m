@@ -9,7 +9,7 @@
 
 
 SingleTrace[charges_,degree_] := Module[{level,filename,ans},
-	level = charges . {3,3,2,2,2};
+	level = charges . levelvector;
 	filename = singleDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_P"<>".mx";
 	If[FileExistsQ[filename],
 		Get[filename];
@@ -371,7 +371,7 @@ AD[charges_,degree_] := Module[{HH=H[charges,degree],tmp},
 		Eigenvalues[Normal[N[HH]]]
 	];
 	tmp = If[Element[Round[#,10^-5],Integers],Round[#],N[Round[#,10^-5]]]&/@tmp;
-	tmp = Join[{charges . {3,3,2,2,2},charges,degree},tmp]//Flatten;
+	tmp = Join[{charges . levelvector,charges,degree},tmp]//Flatten;
 	tmp
 ];
 
