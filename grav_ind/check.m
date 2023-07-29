@@ -48,9 +48,9 @@ home = Switch[user,
 	,
 	_,
 		If[specialQ,
-			Directory[]<>"/bps/"
+			Directory[]<>"/bps/"<>If[schurQ,"grav/","grav16/"]
 			,
-			Directory[]<>"/bps_u/"
+			Directory[]<>"/bps_u/"<>If[schurQ,"grav/","grav16/"]
 		]
 ];
 directory = home<>ToLowerCase[type]<>"/";
