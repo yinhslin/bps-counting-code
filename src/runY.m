@@ -48,16 +48,16 @@ user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"schur/",""]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"schur/","all/"]
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"schur/",""]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"schur/","all/"]
 		]
 	,
 	_,
 		If[specialQ,
-			Directory[]<>"/bps/"<>If[schurQ,"schur/",""]
+			Directory[]<>"/bps/"<>If[schurQ,"schur/","all/"]
 			,
-			Directory[]<>"/bps_u/"<>If[schurQ,"schur/",""]
+			Directory[]<>"/bps_u/"<>If[schurQ,"schur/","all/"]
 		]
 ];
 
