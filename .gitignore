@@ -28,3 +28,4 @@ src/*/
 grav_ind/*/
 *.sh
 *.out
+commands
