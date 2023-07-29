@@ -78,6 +78,7 @@ Stuff[] := Module[{},
 		];
 	A
 	];
+	DD[i_][a_Power]:=DD[i][Expand[a]];
 	
 	DD[i_][n_]:=0/;NumberQ[n];
 	DD[m_][X[a_]^n_]:=n X[a]^(n-1)DD[m][X[a]]/;fp[a]==0;
