@@ -108,7 +108,7 @@ If[numerical,
 		dirX = StringReplace[dir,{"("->"\(",")"->"\)","\ "->"\\\ "}];
 		CreateDirectory[dir];
 		Export[dir<>"in.mtx",A];
-		Run[julia<>" "<>qr<>" Float64 1e-5 "<>dirX<>"in.mtx"<>" "<>dirX<>"out.mtx"];
+		Run[julia<>" "<>qr<>" Float64 1e-8 "<>dirX<>"in.mtx"<>" "<>dirX<>"out.mtx"];
 		ans = Import[dir<>"out.mtx","MTX"];
 		
 		DeleteFile[dir<>"in.mtx"];
