@@ -58,16 +58,16 @@ If[schurQ,
 		ChargeList[level_] := {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[3 nz+2 n\[Theta]1+2 n\[Theta]2 ==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
 	];*)
 	If[perm === False,
-		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[2 nz+n\[Theta]1+n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
+		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[2 nz+n\[Theta]1+n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
 		,
-		ChargeList[level_] := {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[2 nz+n\[Theta]1+n\[Theta]2 == level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
+		ChargeList[level_] := ChargeList[level] = {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[2 nz+n\[Theta]1+n\[Theta]2 == level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
 	];
 	levelvector={0,2,0,1,1};
 	,
 	If[perm === False,
-		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
+		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
 		,
-		ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
+		ChargeList[level_] := ChargeList[level] = {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
 	];
 	levelvector={3,3,2,2,2};
 ];
@@ -77,9 +77,12 @@ If[schurQ,
 (*Multi Graviton Charge List*)
 
 
+file=multiGravitonChargeListDirectory<>ToString[NN]<>".mx";
+(*If[FileExistsQ[file],Get[file]];*)
+
 minLevel=If[schurQ,2,4];
-SingleGravitonChargeList[level_,NN_]:=Select[ChargeList[level],#[[4]]<=NN&&#[[5]]<=NN&];
-Do[Table[MultiGravitonChargeList[c]=If[c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}],{c,ChargeList[l]}],{l,minLevel,maxLevel}];
+SingleGravitonChargeList[level_,NN_]:=SingleGravitonChargeList[level,NN]=Select[ChargeList[level],#[[3]]<=NN&&#[[4]]<=NN&&#[[5]]<=NN&];
+Do[Table[MultiGravitonChargeList[c]=If[c[[3]]<=NN&&c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}],{c,ChargeList[l]}],{l,minLevel,maxLevel}];
 Do[
 Print["level "<>ToString[l]<>", sublevel "<>ToString[ll]];
 cl1=SingleGravitonChargeList[ll,NN];
@@ -100,4 +103,6 @@ Clear[multiGravitonChargeList];
 multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
 DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList]
 ,{l,minLevel,maxLevel},{charges,ChargeList[l]}
-]
+];
+
+DumpSave[file,MultiGravitonChargeList];
