@@ -69,6 +69,19 @@ DistriCharges[tmp_] := Module[{lis = {},x},
 ];
 
 MultiGravitonChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/minDeg}];
+(*MultiGravitonChargeList[charges_] := Module[{level,filename},
+	level = charges . levelvector;
+	filename = multiGravitonChargeListDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx";
+	Check[
+		Get[filename];
+		,
+		Print[filename, " does not exist"];
+		Quit[];
+	];
+	ans = multiGravitonChargeList[charges,NN];
+	ClearAll[multiGravitonChargeList];
+	ans
+];*)
 
 MaxDeg[charges_,N_] := Min[Plus@@charges,N];
 
