@@ -89,11 +89,11 @@ cl1=SingleGravitonChargeList[ll,NN];
 cl2=ChargeList[l-ll];
 Do[
 Do[
-AppendTo[MultiGravitonChargeList[c1+c2],Join[{c1},c3]]
+AppendTo[MultiGravitonChargeList[c1+c2],Sort[Join[{c1},c3]]]
 ,{c3,MultiGravitonChargeList[c2]}
 ];
 charges=c1+c2;
-MultiGravitonChargeList[charges]=DeleteDuplicates[Sort/@MultiGravitonChargeList[charges]];
+MultiGravitonChargeList[charges]=DeleteDuplicates[MultiGravitonChargeList[charges]];
 ,{c1,cl1},{c2,cl2}
 ]
 ,{l,minLevel,maxLevel},{ll,minLevel,l-minLevel}];
