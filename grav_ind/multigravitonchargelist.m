@@ -106,15 +106,21 @@ Do[
 			];
 			charges=c1+c2;
 			MultiGravitonChargeList[charges]=DeleteDuplicates[MultiGravitonChargeList[charges]];
-			Clear[multiGravitonChargeList];
-			multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
-			DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList];
 		,
 			{c1,cl1},{c2,cl2}
 		];
 	,
 		{ll,minLevel,l-minLevel}
 	];
+	
+	Do[
+		Clear[multiGravitonChargeList];
+		multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
+		DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList]
+	,
+		{l,minLevel,maxLevel},{charges,ChargeList[l]}
+	];
+	
 	curLevel=l+1;
 	DumpSave[file,{MultiGravitonChargeList,curLevel}];
 ,
