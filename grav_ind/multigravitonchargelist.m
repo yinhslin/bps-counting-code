@@ -78,9 +78,9 @@ If[schurQ,
 
 
 file=multiGravitonChargeListDirectory<>ToString[NN]<>".mx";
-If[FileExistsQ[file],Get[file],curLevel=4];
-
 minLevel=If[schurQ,2,4];
+If[FileExistsQ[file],Get[file],curLevel=minLevel];
+
 SingleGravitonChargeList[level_,NN_]:=SingleGravitonChargeList[level,NN]=Select[ChargeList[level],#[[3]]<=NN&&#[[4]]<=NN&&#[[5]]<=NN&];
 Do[MultiGravitonChargeList[c]=If[c[[3]]<=NN&&c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}],{l,minLevel,maxLevel},{c,ChargeList[l]}];
 Do[
