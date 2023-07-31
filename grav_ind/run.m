@@ -67,8 +67,8 @@ multiGravitonDirectory = home <> "multigraviton/";
 countDirectory = home <> "count/";
 cohomologyDirectory = home <> "cohomology/";
 juliaDirectory = home <> "julia/";
-hDirectory = home <> "h/";
-directories = {home,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory};
+multiGravitonChargeListDirectory = home <> "multigravitonchargelist/";
+directories = {home,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,multiGravitonChargeListDirectory};
 
 On[Assert];
 

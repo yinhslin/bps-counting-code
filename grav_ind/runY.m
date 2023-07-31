@@ -61,17 +61,13 @@ home = Switch[user,
 		]
 ];
 
-necklaceDirectory = home <> "necklace/";
-singleDirectory = home <> "singletrace/";
-multiDirectory = home <> "multitrace/";
 singleGravitonDirectory = home <> "singlegraviton/";
 multiGravitonDirectory = home <> "multigraviton/";
 countDirectory = home <> "count/";
 cohomologyDirectory = home <> "cohomology/";
 juliaDirectory = home <> "julia/";
-hDirectory = home <> "h/";
-adDirectory = home <> "ad/";
-directories = {home,necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,hDirectory,adDirectory};
+multiGravitonChargeListDirectory = home <> "multigravitonchargelist/";
+directories = {home,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,multiGravitonChargeListDirectory};
 
 On[Assert];
 
