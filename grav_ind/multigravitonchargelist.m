@@ -78,31 +78,45 @@ If[schurQ,
 
 
 file=multiGravitonChargeListDirectory<>ToString[NN]<>".mx";
-(*If[FileExistsQ[file],Get[file]];*)
+If[FileExistsQ[file],Get[file],curLevel=4];
 
 minLevel=If[schurQ,2,4];
 SingleGravitonChargeList[level_,NN_]:=SingleGravitonChargeList[level,NN]=Select[ChargeList[level],#[[3]]<=NN&&#[[4]]<=NN&&#[[5]]<=NN&];
-Do[Table[MultiGravitonChargeList[c]=If[c[[3]]<=NN&&c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}],{c,ChargeList[l]}],{l,minLevel,maxLevel}];
+Do[MultiGravitonChargeList[c]=If[c[[3]]<=NN&&c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}],{l,minLevel,maxLevel},{c,ChargeList[l]}];
 Do[
-Print["level "<>ToString[l]<>", sublevel "<>ToString[ll]];
-cl1=SingleGravitonChargeList[ll,NN];
-cl2=ChargeList[l-ll];
-Do[
-Do[
-AppendTo[MultiGravitonChargeList[c1+c2],Sort[Join[{c1},c3]]]
-,{c3,MultiGravitonChargeList[c2]}
+	Do[
+		charges=c;
+		MultiGravitonChargeList[c]=If[c[[3]]<=NN&&c[[4]]<=NN&&c[[5]]<=NN,{{c}},{}];
+		Clear[multiGravitonChargeList];
+		multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
+		DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList];
+	,
+		{c,ChargeList[l]}
+	];
+	
+	Do[
+		Print["level "<>ToString[l]<>", sublevel "<>ToString[ll]];
+		cl1=SingleGravitonChargeList[ll,NN];
+		cl2=ChargeList[l-ll];
+		Do[
+			Do[
+				AppendTo[MultiGravitonChargeList[c1+c2],Sort[Join[{c1},c3]]]
+			,
+				{c3,MultiGravitonChargeList[c2]}
+			];
+			charges=c1+c2;
+			MultiGravitonChargeList[charges]=DeleteDuplicates[MultiGravitonChargeList[charges]];
+			Clear[multiGravitonChargeList];
+			multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
+			DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList];
+		,
+			{c1,cl1},{c2,cl2}
+		];
+	,
+		{ll,minLevel,l-minLevel}
+	];
+	curLevel=l+1;
+	DumpSave[file,{MultiGravitonChargeList,curLevel}];
+,
+	{l,curLevel,maxLevel}
 ];
-charges=c1+c2;
-MultiGravitonChargeList[charges]=DeleteDuplicates[MultiGravitonChargeList[charges]];
-,{c1,cl1},{c2,cl2}
-]
-,{l,minLevel,maxLevel},{ll,minLevel,l-minLevel}];
-
-Do[
-Clear[multiGravitonChargeList];
-multiGravitonChargeList[charges,NN]=MultiGravitonChargeList[charges];
-DumpSave[multiGravitonChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiGravitonChargeList]
-,{l,minLevel,maxLevel},{charges,ChargeList[l]}
-];
-
-DumpSave[file,MultiGravitonChargeList];
