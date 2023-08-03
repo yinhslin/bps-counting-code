@@ -131,7 +131,7 @@ MultiGraviton[multiGravitonCharge_,degree_,NN_] := Table[Distri[
 		SingleGraviton[multiGravitonCharge[[i]],deg[[i]],NN]
 	,
 		{i,1,Length[multiGravitonCharge]}
-	]] //.Join[GExpandRule,NonCommutativeMultiplyRules]//Expand,{deg,AllDegs[multiGravitonCharge,NN,degree]}] // Flatten;
+	]] //.NonCommutativeMultiplyRules/.GExpandRule//.NonCommutativeMultiplyRules//Expand,{deg,AllDegs[multiGravitonCharge,NN,degree]}] // Flatten;
 
 
 (* ::Section:: *)
