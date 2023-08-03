@@ -68,17 +68,17 @@ DistriCharges[tmp_] := Module[{lis = {},x},
 	DeleteDuplicates[Sort/@Transpose/@lis]
 ];
 
-MultiTraceChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/minDeg}];
+(*MultiTraceChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTrace] ],{nTrace,1,Total[charges]/minDeg}];*)
 MultiTraceChargeList[charges_] := Module[{level,filename},
 	level = charges . levelvector;
-	filename = multiTraceChargeListDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx";
+	filename = multiTraceChargeListDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>".mx";
 	Check[
 		Get[filename];
 		,
 		Print[filename, " does not exist"];
 		Quit[];
 	];
-	ans = multiTraceChargeList[charges,NN];
+	ans = multiTraceChargeList[charges];
 	ClearAll[multiTraceChargeList];
 	ans
 ];

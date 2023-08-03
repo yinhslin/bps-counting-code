@@ -22,7 +22,6 @@ param[flag_] := Module[
 		]
 	];
 
-NN = param["N"] // ToExpression;
 specialQ = True;
 maxLevel = param["l"] // ToExpression;
 perm = True;
@@ -77,25 +76,25 @@ If[schurQ,
 (*Multi Trace Charge List*)
 
 
-file=multiTraceChargeListDirectory<>ToString[NN]<>".mx";
+file=multiTraceChargeListDirectory<>"progress.mx";
 minLevel=If[schurQ,2,4];
 If[FileExistsQ[file],Get[file],curLevel=minLevel];
 
-SingleTraceChargeList[level_,NN_]:=SingleTraceChargeList[level,NN]=ChargeList[level];
+SingleTraceChargeList[level_]:=SingleTraceChargeList[level]=ChargeList[level];
 Do[
 	Do[
 		charges=c;
 		MultiTraceChargeList[c]={{c}};
 		Clear[multiTraceChargeList];
-		multiTraceChargeList[charges,NN]=MultiTraceChargeList[charges];
-		DumpSave[multiTraceChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiTraceChargeList];
+		multiTraceChargeList[charges]=MultiTraceChargeList[charges];
+		DumpSave[multiTraceChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>".mx",multiTraceChargeList];
 	,
 		{c,ChargeList[l]}
 	];
 	
 	Do[
 		Print["level "<>ToString[l]<>", sublevel "<>ToString[ll]];
-		cl1=SingleTraceChargeList[ll,NN];
+		cl1=SingleTraceChargeList[ll];
 		cl2=ChargeList[l-ll];
 		Do[
 			Do[
@@ -114,8 +113,8 @@ Do[
 	
 	Do[
 		Clear[multiTraceChargeList];
-		multiTraceChargeList[charges,NN]=MultiTraceChargeList[charges];
-		DumpSave[multiTraceChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[NN]<>".mx",multiTraceChargeList]
+		multiTraceChargeList[charges]=MultiTraceChargeList[charges];
+		DumpSave[multiTraceChargeListDirectory<>ToString[l]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>".mx",multiTraceChargeList]
 	,
 		{charges,ChargeList[l]}
 	];
