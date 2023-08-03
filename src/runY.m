@@ -71,7 +71,8 @@ cohomologyDirectory = home <> "cohomology/";
 juliaDirectory = home <> "julia/";
 hDirectory = home <> "h/";
 adDirectory = home <> "ad/";
-directories = {home,necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,hDirectory,adDirectory};
+multiTraceChargeListDirectory = home <> "multitracechargelist/";
+directories = {home,necklaceDirectory,singleDirectory,multiDirectory,singleGravitonDirectory,multiGravitonDirectory,countDirectory,cohomologyDirectory,juliaDirectory,hDirectory,adDirectory,multiTraceChargeListDirectory};
 
 On[Assert];
 
