@@ -26,7 +26,7 @@ if MyFloat == Float64 || MyFloat == Float32 || MyFloat == Float16
     diagR = abs.(diag(AQR.R))
     # @show sort(diagR)
     dep = findall(x -> abs(x)>cutoff, diagR)
-    # @show size(dep)
+    @show length(dep)
     ind = filter(x -> x ∉ dep, 1:size(A)[2])
     varIdx = vcat(dep,ind)
     p = sortperm(AQR.cpiv)
