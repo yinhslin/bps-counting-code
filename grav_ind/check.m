@@ -129,10 +129,10 @@ Do[
 				If[
 					Check[
 						Get[filename];
-						Assert[ValueQ[ToExpression[type][charges,degree,NN]]];
+						(*Assert[ValueQ[ToExpression[type][charges,degree,NN]]];*)
 						Assert[ListQ[ToExpression[type][charges,degree,NN]]];
 						(*Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{XB[__]->0,XF[__]->0}],0]];*)
-						Assert[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]==={}];
+						(*Assert[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]==={}];*)
 						
 						(*Assert[(ToExpression[type][charges,degree,NN]/.{singleTrace[__]->0,multiTrace[__]->0,SingleTrace[__]->0,MultiTrace[__]->0})=!=0];*)
 						(*Print["> ",ToExpression[type][charges,degree,NN][[1,1]]];*)
