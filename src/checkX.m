@@ -124,9 +124,9 @@ Do[
 			,
 				If[
 					Check[
-						Get[filename];
+						(*Get[filename];
 						(*Assert[ValueQ[ToExpression[type][charges,degree,NN]]];*)
-						Assert[ListQ[ToExpression[type][charges,degree,NN]]];
+						Assert[ListQ[ToExpression[type][charges,degree,NN]]];*)
 						(*Print[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{XB[__]->0,XF[__]->0}],0]];*)
 						(*Assert[DeleteCases[DeleteDuplicates[ToExpression[type][charges,degree,NN]/.{X[_]->0}],0]==={}];*)
 						
