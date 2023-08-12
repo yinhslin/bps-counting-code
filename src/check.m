@@ -144,7 +144,7 @@ Do[
 					];
 				];
 			];
-			Clear[singleTrace,multiTrace];
+			Clear[singleTrace,multiTrace,singleGraviton,multiGraviton];
 		,
 			{degree,minDeg,maxDeg}
 		]
@@ -179,7 +179,6 @@ Do[
 					];
 				];
 			];
-			Clear[singleTrace,multiTrace];
 		,
 			{degree,minDeg,maxDeg}
 		]

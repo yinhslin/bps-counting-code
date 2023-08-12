@@ -144,7 +144,8 @@ Do[
 					];
 				];
 			];
-			Clear[singleTrace,multiTrace];
+			ClearAll[singleTrace,multiTrace,singleGraviton,multiGraviton];
+			ToExpression["ClearAll["<>ToString[type]<>"]"];
 		,
 			{degree,minDeg,maxDeg}
 		]
@@ -179,7 +180,6 @@ Do[
 					];
 				];
 			];
-			Clear[singleTrace,multiTrace];
 		,
 			{degree,minDeg,maxDeg}
 		]
