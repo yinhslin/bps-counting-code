@@ -96,8 +96,8 @@ If[RefLink[$SystemWordLength,paclet:ref/$SystemWordLength]!=64, Print["SystemWor
 
 label=type<>"_"<>ToString[NN]<>"_"<>ToString[n];
 
-Print["raw: ", Timing[tmp=Series[(1+Sum[indexGAP[NN,i],{i,1,n}])/(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]][[1]]];
-DumpSave[rawDirectory<>label<>".mx", tmp];
+Print["raw: ", Timing[f=Series[(1+Sum[indexGAP[NN,i],{i,1,n}])/(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]][[1]]];
+DumpSave[rawDirectory<>label<>".mx", f];
 
-Print["ind: ", Timing[tmp=Sum[Normal[Simplify[SeriesCoefficient[tmp,{x,0,i}]]]x^i,{i,0,n}]+O[x]^(n+1)][[1]]];
-DumpSave[indDirectory<>label<>".mx", tmp];
+Print["ind: ", Timing[tmp=Sum[Normal[Simplify[SeriesCoefficient[f,{x,0,i}]]]x^i,{i,0,n}]+O[x]^(n+1)][[1]]];
+DumpSave[indDirectory<>label<>".mx", f];
