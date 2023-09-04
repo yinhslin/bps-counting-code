@@ -56,7 +56,7 @@ Do[
 ];
 
 
-(* ::Section::Initialization::Closed:: *)
+(* ::Section::Closed:: *)
 (*GAP*)
 
 
@@ -68,7 +68,7 @@ SnChar[n_,NN_]:=SnChar[n,NN]=Module[{fn=snDirectory<>ToString[n]<>"_"<>ToString[
 ];
 
 
-(* ::Section::Initialization::Closed:: *)
+(* ::Section::Closed:: *)
 (*Index*)
 
 
@@ -107,11 +107,11 @@ Print["ind U: ", Timing[f=Simplify[f]][[1]]];
 DumpSave[indUDirectory<>label<>".mx", f];
 
 
-Print["u1: ", Timing[u1=Simplify[Series[(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]]][[1]]];
-Print["inv: ", Timing[u1inv=Simplify[1/u1]][[1]]];
+(*Print["u1: ", Timing[u1=Simplify[Series[(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]]][[1]]];
+Print["inv: ", Timing[u1inv=Simplify[1/u1]][[1]]];*)
 
 
-Print["raw: ", Timing[f=f*u1inv][[1]]];
+(*Print["raw: ", Timing[f=f*u1inv][[1]]];
 DumpSave[rawDirectory<>label<>".mx", f];
 Print["ind: ", Timing[f=Simplify[f]][[1]]];
-DumpSave[indDirectory<>label<>".mx", f];
+DumpSave[indDirectory<>label<>".mx", f];*)
