@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-(*options = {"-N", "5", "-n", "10", "-t", "a"};*)
+(*options = {"-N", "5", "-n", "15", "-t", "fm"};*)
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -103,13 +103,15 @@ Print["raw U: ", Timing[f=Series[1+Sum[indexGAP[NN,i],{i,1,n}],{x,0,n}]][[1]]];
 DumpSave[rawUDirectory<>label<>".mx", f];
 
 
-Print["ind U: ", Timing[f=Sum[Simplify[SeriesCoefficient[f,{x,0,i}]]x^i,{i,0,n}]+O[x]^(n+1)][[1]]];
+Print["ind U: ", Timing[f=Simplify[f]][[1]]];
 DumpSave[indUDirectory<>label<>".mx", f];
 
 
-Print["raw: ", Timing[f=Series[f/(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]][[1]]];
+Print["u1: ", Timing[u1=Simplify[Series[(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]]][[1]]];
+Print["inv: ", Timing[u1inv=Simplify[1/u1]][[1]]];
+
+
+Print["raw: ", Timing[f=f*u1inv][[1]]];
 DumpSave[rawDirectory<>label<>".mx", f];
-
-
-Print["ind: ", Timing[f=Sum[Simplify[SeriesCoefficient[f,{x,0,i}]]x^i,{i,0,n}]+O[x]^(n+1)][[1]]];
+Print["ind: ", Timing[f=Simplify[f]][[1]]];
 DumpSave[indDirectory<>label<>".mx", f];
