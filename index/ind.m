@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-(*options = {"-N", "5", "-n", "15", "-t", "fm"};*)
+(*options = {"-N", "4", "-n", "15", "-t", "fm"};*)
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -45,9 +45,10 @@ snDirectory = home <> "sn/";
 rawUDirectory = home <> "rawU/";
 rawDirectory = home <> "raw/";
 indUDirectory = home <> "indU/";
+indUInvDirectory = home <> "indU/";
 indDirectory = home <> "ind/";
 
-directories = {home,snDirectory,rawDirectory,rawUDirectory,indDirectory,indUDirectory};
+directories = {home,snDirectory,rawDirectory,rawUDirectory,indDirectory,indUDirectory,indUInvDirectory};
 
 Do[
 	If[!FileExistsQ[directory],CreateDirectory[directory]];
@@ -99,19 +100,67 @@ If[RefLink[$SystemWordLength,paclet:ref/$SystemWordLength]!=64, Print["SystemWor
 label=type<>"_"<>ToString[NN]<>"_"<>ToString[n];
 
 
+file=rawUDirectory<>label<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
 Print["raw U: ", Timing[f=Series[1+Sum[indexGAP[NN,i],{i,1,n}],{x,0,n}]][[1]]];
-DumpSave[rawUDirectory<>label<>".mx", f];
+DumpSave[file, f];
+];
 
 
+file=indUDirectory<>label<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
 Print["ind U: ", Timing[f=Simplify[f]][[1]]];
-DumpSave[indUDirectory<>label<>".mx", f];
+DumpSave[file, f];
+];
 
 
-(*Print["u1: ", Timing[u1=Simplify[Series[(1+Sum[indexGAP[1,i],{i,1,n}]),{x,0,n}]]][[1]]];
-Print["inv: ", Timing[u1inv=Simplify[1/u1]][[1]]];*)
+If[NN==1,
+file=indUInvDirectory<>type<>"_"<>ToString[n]<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
+Print["inv: ", Timing[u1inv=Simplify[1/f]][[1]]];
+DumpSave[file, u1inv];
+];
+];
 
 
-(*Print["raw: ", Timing[f=f*u1inv][[1]]];
-DumpSave[rawDirectory<>label<>".mx", f];
+If[NN!=1,
+file=indUInvDirectory<>type<>"_"<>ToString[n]<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
+Print["U1 inv incomplete"];Quit[]];
+];
+
+
+If[NN!=1,
+file=rawDirectory<>label<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
+Print["raw: ", Timing[f=f*u1inv][[1]]];
+DumpSave[file, f];
+];
+];
+
+
+If[NN!=1,
+file=indDirectory<>label<>".mx";
+If[FileExistsQ[file]
+,
+Get[file];
+,
 Print["ind: ", Timing[f=Simplify[f]][[1]]];
-DumpSave[indDirectory<>label<>".mx", f];*)
+DumpSave[file, f];
+];
+];
