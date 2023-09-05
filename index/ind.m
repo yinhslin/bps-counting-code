@@ -45,7 +45,7 @@ snDirectory = home <> "sn/";
 rawUDirectory = home <> "rawU/";
 rawDirectory = home <> "raw/";
 indUDirectory = home <> "indU/";
-indUInvDirectory = home <> "indU/";
+indUInvDirectory = home <> "indUInv/";
 indDirectory = home <> "ind/";
 
 directories = {home,snDirectory,rawDirectory,rawUDirectory,indDirectory,indUDirectory,indUInvDirectory};
