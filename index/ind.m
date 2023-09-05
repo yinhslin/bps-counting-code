@@ -103,6 +103,7 @@ label=type<>"_"<>ToString[NN]<>"_"<>ToString[n];
 file=rawUDirectory<>label<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load raw U"];
 Get[file];
 ,
 Print["raw U: ", Timing[f=Series[1+Sum[indexGAP[NN,i],{i,1,n}],{x,0,n}]][[1]]];
@@ -113,6 +114,7 @@ DumpSave[file, f];
 file=indUDirectory<>label<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load ind U"];
 Get[file];
 ,
 Print["ind U: ", Timing[f=Simplify[f]][[1]]];
@@ -124,6 +126,7 @@ If[NN==1,
 file=indUInvDirectory<>type<>"_"<>ToString[n]<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load inv"];
 Get[file];
 ,
 Print["inv: ", Timing[u1inv=Simplify[1/f]][[1]]];
@@ -136,6 +139,7 @@ If[NN!=1,
 file=indUInvDirectory<>type<>"_"<>ToString[n]<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load inv"];
 Get[file];
 ,
 Print["U1 inv incomplete"];Quit[]];
@@ -146,6 +150,7 @@ If[NN!=1,
 file=rawDirectory<>label<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load raw"];
 Get[file];
 ,
 Print["raw: ", Timing[f=f*u1inv][[1]]];
@@ -158,6 +163,7 @@ If[NN!=1,
 file=indDirectory<>label<>".mx";
 If[FileExistsQ[file]
 ,
+Print["load ind];
 Get[file];
 ,
 Print["ind: ", Timing[f=Simplify[f]][[1]]];
