@@ -163,7 +163,7 @@ If[NN!=1,
 file=indDirectory<>label<>".mx";
 If[FileExistsQ[file]
 ,
-Print["load ind];
+Print["load ind"];
 Get[file];
 ,
 Print["ind: ", Timing[f=Simplify[f]][[1]]];
