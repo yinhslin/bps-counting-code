@@ -118,6 +118,7 @@ Print["load ind U"];
 Get[file];
 ,
 Print["ind U: ", Timing[
+f=Simplify[f];
 cl=Expand[CoefficientList[f,x]];
 f=Sum[Normal[Simplify[Series[cl[[m+1]],{b,0,m}]]]x^m,{m,0,n}]+O[x]^(n+1);
 (*f=Simplify[f]*)
