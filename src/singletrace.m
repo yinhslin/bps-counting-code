@@ -12,8 +12,15 @@ group = If[specialQ && NN==2,
 ];
 
 Seeds[singleTraceCharge_,degree_] := Module[{pivot = Position[singleTraceCharge,_?(#>0&)][[1,1]],range},
+	Which[
+		su122Q, If[singleTraceCharge[[5]]!=degree,Return[{{},{},{},{},{}}]];
+	];
 	Table[
-		range = If[i<=2,Range[0,100],{0,1}];
+		Which[
+			su122Q, range = Which[i<=2,Range[0,100],i==3||i==4,{0,1},i==5,{1}];
+		,
+			True, range = If[i<=2,Range[0,100],{0,1}];
+		];
 		If[i==pivot,
 			DeleteDuplicates[Sort[Permute[#,group[degree]]][[1]]&/@Flatten[(Permutations[#]&/@IntegerPartitions[singleTraceCharge[[i]],{degree},range]),1]]
 		,

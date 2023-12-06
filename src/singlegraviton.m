@@ -7,13 +7,26 @@
 (*Protect[nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3,z1,z2,th1,th2,th3,X];*)
 
 TwoGroupsData[singleGravCharge_,degree_]:=Module[{lis={},x},
-	Do[
-		x={x1,x2,singleGravCharge[[3]]-x3,singleGravCharge[[4]]-x4,singleGravCharge[[5]]-x5};
-		If[Total[x]==degree,
-			AppendTo[lis,{singleGravCharge-x,x}];
+	Which[
+		su122Q, 
+		If[singleGravCharge[[5]]!=degree,Return[lis]];
+		Do[
+			x={x1,x2,singleGravCharge[[3]]-x3,singleGravCharge[[4]]-x4,singleGravCharge[[5]]-x5};
+			If[Total[x]==degree,
+				AppendTo[lis,{singleGravCharge-x,x}];
+			];
+		,
+			{x1,0,Min[singleGravCharge[[1]],1]},{x2,0,Min[singleGravCharge[[2]],1]},{x3,0,Min[singleGravCharge[[3]],1]},{x4,0,Min[singleGravCharge[[4]],1]},{x5,{0}}
+		],
+		True,
+		Do[
+			x={x1,x2,singleGravCharge[[3]]-x3,singleGravCharge[[4]]-x4,singleGravCharge[[5]]-x5};
+			If[Total[x]==degree,
+				AppendTo[lis,{singleGravCharge-x,x}];
+			];
+		,
+			{x1,0,Min[singleGravCharge[[1]],1]},{x2,0,Min[singleGravCharge[[2]],1]},{x3,0,Min[singleGravCharge[[3]],1]},{x4,0,Min[singleGravCharge[[4]],1]},{x5,0,Min[singleGravCharge[[5]],1]}
 		];
-	,
-		{x1,0,Min[singleGravCharge[[1]],1]},{x2,0,Min[singleGravCharge[[2]],1]},{x3,0,Min[singleGravCharge[[3]],1]},{x4,0,Min[singleGravCharge[[4]],1]},{x5,0,Min[singleGravCharge[[5]],1]}
 	];
 	lis
 ];
