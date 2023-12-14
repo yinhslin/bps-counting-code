@@ -53,16 +53,16 @@ user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"schur/","all/"]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"schur/","all/"]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
 	_,
 		If[specialQ,
-			Directory[]<>"/bps/"<>If[schurQ,"schur/","all/"]
+			Directory[]<>"/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 			,
-			Directory[]<>"/bps_u/"<>If[schurQ,"schur/","all/"]
+			Directory[]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 ];
 
