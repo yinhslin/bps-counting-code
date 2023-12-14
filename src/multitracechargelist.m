@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-options = {"-N", "2", "-l", "12", "-su121"};
+(*options = {"-N", "2", "-l", "12", "-su121"};*)
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -54,8 +54,8 @@ multiTraceChargeListDirectory = home <> "multitracechargelist/";
 If[!FileExistsQ[multiTraceChargeListDirectory],CreateDirectory[multiTraceChargeListDirectory]];
 
 
-Which[schurQ,
-	If[perm === False,
+Which[
+	schurQ, If[perm === False,
 		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[2 nz+n\[Theta]1+n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
 		,
 		ChargeList[level_] := ChargeList[level] = {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[2 nz+n\[Theta]1+n\[Theta]2 == level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];

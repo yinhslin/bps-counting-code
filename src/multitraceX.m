@@ -85,7 +85,10 @@ MultiTraceChargeList[charges_] := Module[{level,filename},
 
 MaxDeg[charges_] := Plus@@charges;
 
-AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+Which[
+	su122Q || su121Q, AllDegs[charges_] := (Outer@@Join[{f},{charges[[5]]}&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+	True, AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+];
 
 AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
 
