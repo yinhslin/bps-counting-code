@@ -186,7 +186,7 @@ t = Timing[
 			Print["level ",level,", charges ",cnt,"/",numLevels,": ", charges];
 			maxDeg=Plus@@charges;
 			Which[
-				su122Q || su121Q, Degs = {charges[[5]]};
+				su122Q || su121Q, Degs = If[charges[[5]] < minDeg, {}, {charges[[5]]}];
 				,
 				True, Degs = Range[minDeg,maxDeg];
 			];
