@@ -41,6 +41,8 @@ chunk = param["c"] // ToExpression;
 If[chunk === Null, chunk = 10^3];
 schurQ = param["sch"] // ToExpression;
 If[schurQ === Null, schurQ = False, schurQ = True];
+su122Q = param["su122"] // ToExpression;
+If[su122Q === Null, su122Q = False, su122Q = True];
 
 
 user = $Username;
