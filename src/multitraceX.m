@@ -85,7 +85,20 @@ MultiTraceChargeList[charges_] := Module[{level,filename},
 
 MaxDeg[charges_] := Plus@@charges;
 
+Which[
+	su122Q || su121Q, AllDegs[charges_] := (Outer@@Join[{f},
+		If[minDeg <= #[[5]] <= MaxDeg[#],
+			{#[[5]]}
+		,
+			{}
+		]
+	&/@charges]//Flatten)/.f[x___]:>{x};,
+	True, AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+];
+
+(*
 AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+*)
 
 AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
 
@@ -127,6 +140,17 @@ MultiTrace[multiTraceCharge_,degree_,NN_] := Table[Distri[
 	,
 		{i,1,Length[multiTraceCharge]}
 	]] //.GExpandRule//.NonCommutativeMultiplyRules//Expand,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
+	
+(*MultiTrace[multiTraceCharge_,degree_,NN_] := Distri[
+	Table[
+		If[minDeg <= multiTraceCharge[[i,5]] <= MaxDeg[multiTraceCharge[[i]]],
+			SingleTrace[multiTraceCharge[[i]],multiTraceCharge[[i,5]],NN]
+		,
+			{}
+		]
+	,
+		{i,1,Length[multiTraceCharge]}
+	]] //.GExpandRule//.NonCommutativeMultiplyRules//Expand;*)
 
 
 (* ::Section:: *)

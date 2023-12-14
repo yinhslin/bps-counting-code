@@ -16,10 +16,18 @@ CountQ[charges_,degree_,NN_] := Module[{level,filename},
 ];
 Cohomology[charges_,degree_,NN_] := {charges . levelvector,charges,degree,NN,CountQ[charges,degree,NN][[1]]-CountQ[charges,degree-1,NN][[2]],CountQ[charges,degree-1,NN][[3]]}//Flatten;
 Cohomology[charges_,degree_,NN_] := Module[{count1 = CountQ[charges,degree,NN], count2 = CountQ[charges,degree-1,NN]},
-	If[count1 =!= Null && count2 =!= Null,
-		{charges . levelvector,charges,degree,NN,count1[[1]]-count2[[2]]}//Flatten
-	,
-		Null
+	Which[
+		su121Q || su122Q, If[count1 =!= Null,
+				{charges . levelvector,charges,degree,NN,count1[[1]]}//Flatten
+			,
+				Null
+			]
+		,
+		True, If[count1 =!= Null && count2 =!= Null,
+			{charges . levelvector,charges,degree,NN,count1[[1]]-count2[[2]]}//Flatten
+		,
+			Null
+		]
 	]
 ];
 
