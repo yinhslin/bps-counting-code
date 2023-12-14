@@ -18,7 +18,7 @@ Cohomology[charges_,degree_,NN_] := {charges . levelvector,charges,degree,NN,Cou
 Cohomology[charges_,degree_,NN_] := Module[{count1 = CountQ[charges,degree,NN], count2 = CountQ[charges,degree-1,NN]},
 	If[count1 =!= Null && count2 =!= Null,
 		Which[
-			su122Q, {charges . levelvector,charges,degree,NN,count1[[1]],count2[[3]]}//Flatten,
+			su121Q||su122Q, {charges . levelvector,charges,degree,NN,count1[[1]],count2[[3]]}//Flatten,
 			True, {charges . levelvector,charges,degree,NN,count1[[1]]-count2[[2]],count2[[3]]}//Flatten
 		]
 	,

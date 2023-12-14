@@ -17,7 +17,19 @@ TwoGroupsData[singleGravCharge_,degree_]:=Module[{lis={},x},
 			];
 		,
 			{x1,0,Min[singleGravCharge[[1]],1]},{x2,0,Min[singleGravCharge[[2]],1]},{x3,0,Min[singleGravCharge[[3]],1]},{x4,0,Min[singleGravCharge[[4]],1]},{x5,{0}}
-		],
+		]
+		,
+		su121Q, 
+		If[singleGravCharge[[4]]!=degree||singleGravCharge[[5]]!=degree,Return[lis]];
+		Do[
+			x={x1,x2,singleGravCharge[[3]]-x3,singleGravCharge[[4]]-x4,singleGravCharge[[5]]-x5};
+			If[Total[x]==degree,
+				AppendTo[lis,{singleGravCharge-x,x}];
+			];
+		,
+			{x1,0,Min[singleGravCharge[[1]],1]},{x2,0,Min[singleGravCharge[[2]],1]},{x3,0,Min[singleGravCharge[[3]],1]},{x4,{0}},{x5,{0}}
+		]
+		,
 		True,
 		Do[
 			x={x1,x2,singleGravCharge[[3]]-x3,singleGravCharge[[4]]-x4,singleGravCharge[[5]]-x5};

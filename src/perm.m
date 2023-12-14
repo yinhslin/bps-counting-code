@@ -59,7 +59,10 @@ Stuff[] := Module[{},
 
 	Perm[seed_,perm_] := Module[{ans,repl,repl0},
 		If[Which[
-				su122Q,Length[seed]>0&&perm[[2,3]]==3,
+				su122Q,Length[seed]>0&&perm[[2,3]]==3
+				,
+				su121Q,Length[seed]>0&&perm[[2,2]]==2&&perm[[2,3]]==3
+				,
 				True,Length[seed]>0
 			],
 			repl = {(X[c_]):>(X[ index[ Sequence@@PermCharges[perm[[1]],perm[[2]],{nz1[c],nz2[c],n\[Theta]1[c],n\[Theta]2[c],n\[Theta]3[c]}],mati[c],matj[c] ] ])};
