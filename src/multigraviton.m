@@ -72,7 +72,20 @@ MultiGravitonChargeList[charges_] :=Join@@Table[DistriCharges[Seeds[charges,nTra
 
 MaxDeg[charges_] := Plus@@charges;
 
+Which[
+	su122Q || su121Q, AllDegs[charges_] := (Outer@@Join[{f},
+		If[minDeg <= #[[5]] <= MaxDeg[#],
+			{#[[5]]}
+		,
+			{}
+		]
+	&/@charges]//Flatten)/.f[x___]:>{x};,
+	True, AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+];
+
+(*
 AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+*)
 
 AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
 
