@@ -52,7 +52,7 @@ Stuff[] := Module[{},
 	schurQ,
 		PermCharges[perm1_,perm2_,charges_] := Join[charges[[1;;3]],Permute[charges[[4;;5]],perm2]];
 		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[1]},{perm2,SymmetricGroup[2]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
-	(*,
+	,
 	su122Q,
 		PermCharges[perm1_,perm2_,charges_] := Join[Permute[charges,perm1],Permute[charges[[3;;4]],perm2],charges[[5;;5]]];
 		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[2]},{perm2,SymmetricGroup[2]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
@@ -60,7 +60,7 @@ Stuff[] := Module[{},
 	su121Q,
 		PermCharges[perm1_,perm2_,charges_] := Join[Permute[charges,perm1],Permute[charges[[3;;3]],perm2],charges[[4;;5]]];
 		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[2]},{perm2,SymmetricGroup[1]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
-	*),
+	,
 	True,
 		PermCharges[perm1_,perm2_,charges_] := Join[Permute[charges,perm1],Permute[charges[[3;;5]],perm2]];
 		Perms[charges_] := Flatten[Table[{perm1,perm2,PermCharges[perm1,perm2,charges]},{perm1,SymmetricGroup[2]},{perm2,SymmetricGroup[3]}],1]//DeleteDuplicates[#,#1[[3]]==#2[[3]]&]&;
@@ -68,13 +68,13 @@ Stuff[] := Module[{},
 	];
 
 	Perm[seed_,perm_] := Module[{ans,repl,repl0},
-		If[Which[
+		If[(*Which[
 				su122Q,Length[seed]>0&&perm[[2,3]]==3
 				,
 				su121Q,Length[seed]>0&&perm[[2,2]]==2&&perm[[2,3]]==3
 				,
 				True,Length[seed]>0
-			],
+			]*)Length[seed]>0,
 			repl = {(X[c_]):>(X[ index[ Sequence@@PermCharges[perm[[1]],perm[[2]],{nz1[c],nz2[c],n\[Theta]1[c],n\[Theta]2[c],n\[Theta]3[c]}],mati[c],matj[c] ] ])};
 			ans = Table[
 				seed[[i]] /. repl //.NonCommutativeMultiplyRules
