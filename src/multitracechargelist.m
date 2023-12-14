@@ -5,7 +5,7 @@
 
 
 options = $CommandLine;
-(*options = {"-N", "2", "-lmin", "4", "-lmax", "12"};*)
+options = {"-N", "2", "-l", "12", "-su121"};
 param[flag_] := Module[
 		{position, flagList}
 	, 
@@ -27,22 +27,26 @@ maxLevel = param["l"] // ToExpression;
 perm = True;
 schurQ = param["sch"] // ToExpression;
 If[schurQ === Null, schurQ = False, schurQ = True];
+su122Q = param["su122"] // ToExpression;
+If[su122Q === Null, su122Q = False, su122Q = True];
+su121Q = param["su121"] // ToExpression;
+If[su121Q === Null, su121Q = False, su121Q = True];
 
 
 user = $Username;
 home = Switch[user,
 	"yhlin",
 		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"schur/","all/"]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 			,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"schur/","all/"]
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
 	_,
 		If[specialQ,
-			Directory[]<>"/bps/"<>If[schurQ,"schur/","all/"]
+			Directory[]<>"/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 			,
-			Directory[]<>"/bps_u/"<>If[schurQ,"schur/","all/"]
+			Directory[]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 ];
 
@@ -50,12 +54,7 @@ multiTraceChargeListDirectory = home <> "multitracechargelist/";
 If[!FileExistsQ[multiTraceChargeListDirectory],CreateDirectory[multiTraceChargeListDirectory]];
 
 
-If[schurQ,
-	(*If[perm === False,?
-		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[3 nz+2 n\[Theta]1+2 n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
-		,
-		ChargeList[level_] := {0,nz,0,n\[Theta]1,n\[Theta]2}/.Solve[3 nz+2 n\[Theta]1+2 n\[Theta]2 ==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
-	];*)
+Which[schurQ,
 	If[perm === False,
 		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{0,nz},{0,n\[Theta]1,n\[Theta]2}}/.Solve[2 nz+n\[Theta]1+n\[Theta]2==level,{nz,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
 		,
@@ -63,7 +62,14 @@ If[schurQ,
 	];
 	levelvector={0,2,0,1,1};
 	,
-	If[perm === False,
+	su121Q, If[perm === False,
+		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]2}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+4 n\[Theta]2==level,{nzn,nzp,n\[Theta]1,n\[Theta]2},NonNegativeIntegers],{2}]];
+		,
+		ChargeList[level_] := ChargeList[level] = {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]2}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+4 n\[Theta]2==level,{nzn,nzp,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
+	];
+	levelvector={3,3,2,2,2};
+	,
+	True, If[perm === False,
 		ChargeList[level_] := ChargeList[level] = Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]];
 		,
 		ChargeList[level_] := ChargeList[level] = {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
