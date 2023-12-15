@@ -97,13 +97,21 @@ Which[schurQ,
 	];
 	levelvector={0,2,0,1,1};
 	,
+	su122Q, 
+	If[perm === False,
+		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[ {Sort[#[[1]]], Sort[#[[2]]], #[[3]]} &/@ ({{nzn,nzp},{n\[Theta]1,n\[Theta]2},{n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers]) ];
+		,
+		ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers];
+	];
+	levelvector={3,3,2,2,2};
+	,
 	su121Q,
 	If[perm === False,
-		ChargeList[level_] := Select[ Flatten[#]&/@DeleteDuplicates[Map[Sort,{{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]3}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers],{2}]], #[[4]]==#[[5]]& ];
+		ChargeList[level_] := Flatten[#]&/@DeleteDuplicates[ {Sort[#[[1]]],#[[2]]} &/@ ({{nzn,nzp},{n\[Theta]1,n\[Theta]2,n\[Theta]2}}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+4 n\[Theta]2==level,{nzn,nzp,n\[Theta]1,n\[Theta]2},NonNegativeIntegers]) ];
 		,
-		ChargeList[level_] := Select[ {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+2 n\[Theta]2+2 n\[Theta]3==level,{nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]3},NonNegativeIntegers], #[[4]]==#[[5]]& ];
+		ChargeList[level_] := {nzn,nzp,n\[Theta]1,n\[Theta]2,n\[Theta]2}/.Solve[3 nzn+3 nzp+2 n\[Theta]1+4 n\[Theta]2==level,{nzn,nzp,n\[Theta]1,n\[Theta]2},NonNegativeIntegers];
 	];
-	levelvector={3,3,2,2,2};	
+	levelvector={3,3,2,2,2};
 	,
 	True, 
 	If[perm === False,
