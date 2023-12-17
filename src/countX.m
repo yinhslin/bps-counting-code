@@ -187,7 +187,7 @@ If[numerical,
 	(* A must be a sparse matrix *)
 	MyRowReduce[A0_] := Module[{ans,id,dir,dirX,A,U},
 		A = A0 . Transpose[A0];
-		U = DiagonalMatrix[ SparseArray[ Table[A[[i,i]]^(-1/2),{i,1,Length[A]}] ] ];
+		U = DiagonalMatrix[ SparseArray[ Table[ If[A[[i,i]] == 0, 1, A[[i,i]]^(-1/2)] ,{i,1,Length[A]}] ] ];
 		A = U . A . U;
 		(* TODO *)
 		Print["density: ", A["Density"]];
@@ -215,7 +215,7 @@ If[numerical,
 ,
 	MyRowReduce[A0_] := Module[{A,U},
 		A = A0 . Transpose[A0];
-		U = DiagonalMatrix[ SparseArray[ Table[A[[i,i]]^(-1/2),{i,1,Length[A]}] ] ];
+		U = DiagonalMatrix[ SparseArray[ Table[ If[A[[i,i]] == 0, 1, A[[i,i]]^(-1/2)] ,{i,1,Length[A]}] ] ];
 		A = U . A . U;
 		MatrixRank[N[A]]
 	];
