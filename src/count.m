@@ -4,7 +4,7 @@
 (*Count*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Multi-trace and Multi-graviton*)
 
 
@@ -37,21 +37,22 @@ MultiGraviton[charges_,degree_,NN_] := Module[{level,filename,ans},
 	];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Q and Non-commutative multiply*)
 
 
 Stuff[] := Module[{},
 	(* index relations *)
-	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^15+a1*2^11+a2*2^7+a3*2^6+a4*2^5+a5*2^4+(i-1)*2^2+(j-1);
-	fp[a_]:=Quotient[a,2^15];
-	nz1[a_]:=Quotient[Mod[a,2^15],2^11];
-	nz2[a_]:=Quotient[Mod[a,2^11],2^7];
-	n\[Theta]1[a_]:=Quotient[Mod[a,2^7],2^6];
-	n\[Theta]2[a_]:=Quotient[Mod[a,2^6],2^5];
-	n\[Theta]3[a_]:=Quotient[Mod[a,2^5],2^4];
-	mati[a_]:=Quotient[Mod[a,2^4],2^2]+1;
-	matj[a_]:=Mod[a,2^2]+1;
+	Log2NN=Log[2,NN]//Ceiling;
+	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^(2*Log2NN+11)+a1*2^(2*Log2NN+7)+a2*2^(2*Log2NN+3)+a3*2^(2*Log2NN+2)+a4*2^(2*Log2NN+1)+a5*2^(2*Log2NN)+(i-1)*2^Log2NN+(j-1);
+	fp[a_]:=Quotient[a,2^(2*Log2NN+11)];
+	nz1[a_]:=Quotient[Mod[a,2^(2*Log2NN+11)],2^(2*Log2NN+7)];
+	nz2[a_]:=Quotient[Mod[a,2^(2*Log2NN+7)],2^(2*Log2NN+3)];
+	n\[Theta]1[a_]:=Quotient[Mod[a,2^(2*Log2NN+3)],2^(2*Log2NN+2)];
+	n\[Theta]2[a_]:=Quotient[Mod[a,2^(2*Log2NN+2)],2^(2*Log2NN+1)];
+	n\[Theta]3[a_]:=Quotient[Mod[a,2^(2*Log2NN+1)],2^(2*Log2NN)];
+	mati[a_]:=Quotient[Mod[a,2^(2*Log2NN)],2^Log2NN]+1;
+	matj[a_]:=Mod[a,2^Log2NN]+1;
 
 	(* resture default NonCommutativeMultiply *)
 	Unprotect[NonCommutativeMultiply];
@@ -100,10 +101,19 @@ Stuff[] := Module[{},
 	];
 
 	(* matrix and product *)
-	If[specialQ,
-		X[a_] := -Sum[X[Quotient[a,2^4]*2^4 + 5 k],{k,0,NN-2}]/;Mod[a-(NN-1)*2^2-(NN-1),2^4]==0;
+	If[specialQ&&(!spQ),
+		X[a_] := -Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]/;mati[a]==NN&&matj[a]==NN;
 	];
-	X[a_]:=0/;Quotient[a,2^5]==2^10;
+	If[spQ,
+		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2>=matj[a];
+		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]-NN/2]]/;NN/2<mati[a]&&NN/2>=matj[a]&&mati[a]-NN/2>matj[a];
+		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]-NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2<matj[a]&&mati[a]+NN/2>matj[a];
+	];
+	If[soQ,
+		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a],mati[a]]]/;mati[a]>matj[a];
+		X[a_] := 0/;mati[a]==matj[a];
+	];
+	X[a_]:=0/;nz1[a]==0&&nz2[a]==0&&n\[Theta]1[a]==0&&n\[Theta]2[a]==0&&n\[Theta]3[a]==0;
 
 	Grading[ a_Plus ] := Max @@ (Grading /@ (List @@ a));
 	Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));
@@ -189,11 +199,11 @@ UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{{},{}},
-		reducedTraces=traces/.Times->UnTimes;
+		reducedTraces=traces/.Times->UnTimes/.Power->UnPower;
 		Allterms=CollectTerms[reducedTraces];
 		CoVector=CoefficientArrays[reducedTraces,Allterms][[2]];
 		SimpVector = DeleteCases[CoVector//MyRowReduce,Table[0,{l,1,Length[CoVector[[1]]]}]];
-		{SimpVector , Allterms/.UnTimes->Times}
+		{SimpVector , Allterms/.UnTimes->Times/.UnPower->Power}
 	]
 ];
 
@@ -204,7 +214,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	,
 		{t,Allterms}
 	];
-	QStuff = QStuff/.Times->UnTimes;
+	QStuff = QStuff/.Times->UnTimes/.Power->UnPower;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.](*/.Times->UnTimes*);
 	If[reducedQStuff==={},
 	{{},{}}
@@ -213,7 +223,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	Qmatrix = CoefficientArrays[reducedQStuff,AllQTerms][[2]];*)
 	AllQTerms = CollectTerms[QStuff];
 	Qmatrix = CoefficientArrays[QStuff,AllQTerms][[2]];
-	{DeleteCases[SparseArray[Chop[SimpVector . Qmatrix ]]//MyRowReduce,Table[0,{l,1,Length[Qmatrix[[1]]]}]], AllQTerms/.UnTimes->Times}
+	{DeleteCases[SparseArray[Chop[SimpVector . Qmatrix ]]//MyRowReduce,Table[0,{l,1,Length[Qmatrix[[1]]]}]], AllQTerms/.UnTimes->Times/.UnPower->Power}
 	]
 ];
 
@@ -235,11 +245,11 @@ CountQ[charges_,degree_,NN_] := Module[{bare,ind,Qbare,Qind,grav,Allterms,SimpQV
 	(* TODO *)
 	
 	grav = DeleteCases[DeleteCases[MultiGraviton[charges,degree+1,NN],0],0.];
-	grav = grav/.Times->UnTimes;
+	grav = grav/.Times->UnTimes/.Power->UnPower;
 	If[grav=={},
 		Return[Flatten[ {(*charges, degree, NN,*) Length[ind[[1]]]-Length[Qind[[1]]], Length[Qind[[1]]], 0} ]]
 	];
-	Allterms = DeleteDuplicates[Join[Qind[[2]],CollectTerms[grav]/.UnTimes->Times]]/.Times->UnTimes;
+	Allterms = DeleteDuplicates[Join[Qind[[2]],CollectTerms[grav]/.UnTimes->Times/.UnPower->Power]]/.Times->UnTimes/.Power->UnPower;
 	SimpQVector = SparseArray[Qind[[1]],{Length[Qind[[1]]],Length[Allterms]}];
 	gravCoVector = CoefficientArrays[grav,Allterms][[2]];
 	SimpVector = DeleteCases[Join[SimpQVector,gravCoVector]//MyRowReduce,Table[0,Length[gravCoVector[[1]]]]];
