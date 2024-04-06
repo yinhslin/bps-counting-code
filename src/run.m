@@ -25,6 +25,10 @@ param[flag_] := Module[
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
 If[specialQ === Null, specialQ = True, specialQ = False];
+soQ = param["so"] // ToExpression;
+If[soQ === Null, soQ = False, soQ = True];
+spQ = param["sp"] // ToExpression;
+If[spQ === Null, spQ = False, spQ = True];
 minLevel = param["lmin"] // ToExpression;
 maxLevel = param["lmax"] // ToExpression;
 ind = param["i"] // ToExpression;
@@ -52,16 +56,26 @@ If[su121Q === Null, su121Q = False, su121Q = True];
 user = $Username;
 home = Switch[user,
 	"yhlin",
-		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-			,
+		Which[
+			spQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
 	_,
-		If[specialQ,
-			Directory[]<>"/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-			,
+		Which[
+			spQ,
+			Directory[]<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			Directory[]<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			Directory[]<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
 			Directory[]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 ];
@@ -170,6 +184,13 @@ Get[job<>".m"];
 If[numKernels =!= Null,
 	InitiateKernels[];
 ];
+
+
+!
+
+
+
+
 
 
 (* ::Section:: *)
