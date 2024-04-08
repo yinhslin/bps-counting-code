@@ -25,6 +25,10 @@ param[flag_] := Module[
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
 If[specialQ === Null, specialQ = True, specialQ = False];
+soQ = param["so"] // ToExpression;
+If[soQ === Null, soQ = False, soQ = True];
+spQ = param["sp"] // ToExpression;
+If[spQ === Null, spQ = False, spQ = True];
 minLevel = param["lmin"] // ToExpression;
 maxLevel = param["lmax"] // ToExpression;
 ind = param["i"] // ToExpression;
@@ -48,16 +52,26 @@ If[schurQ === Null, schurQ = False, schurQ = True];
 user = $Username;
 home = Switch[user,
 	"yhlin",
-		If[specialQ,
-			"/n/holyscratch01/yin_lab/Users/yhlin/bps/"<>If[schurQ,"grav/","grav16/"]
-			,
+		Which[
+			spQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_sp/"<>If[schurQ,"grav/","grav16/"],
+			soQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_so/"<>If[schurQ,"grav/","grav16/"],
+			specialQ,
+			"/n/holyscratch01/yin_lab/Users/yhlin/bps_su/"<>If[schurQ,"grav/","grav16/"],
+			!specialQ,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>If[schurQ,"grav/","grav16/"]
 		]
 	,
 	_,
-		If[specialQ,
-			Directory[]<>"/bps/"<>If[schurQ,"grav/","grav16/"]
-			,
+		Which[
+			spQ,
+			Directory[]<>"/bps_sp/"<>If[schurQ,"grav/","grav16/"],
+			soQ,
+			Directory[]<>"/bps_so/"<>If[schurQ,"grav/","grav16/"],
+			specialQ,
+			Directory[]<>"/bps_su/"<>If[schurQ,"grav/","grav16/"],
+			!specialQ,
 			Directory[]<>"/bps_u/"<>If[schurQ,"grav/","grav16/"]
 		]
 ];
