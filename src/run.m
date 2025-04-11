@@ -67,6 +67,18 @@ home = Switch[user,
 			"/n/holyscratch01/yin_lab/Users/yhlin/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
+	"zhangqim",
+		Which[
+			spQ,
+			"/home/zhangqim/WORK/Q_coho/results/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			"/home/zhangqim/WORK/Q_coho/results/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			"/home/zhangqim/WORK/Q_coho/results/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
+			"/home/zhangqim/WORK/Q_coho/results/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
+		]
+	,
 	_,
 		Which[
 			spQ,
