@@ -8,12 +8,30 @@
 Unprotect[X];
 
 Stuff[] := Module[{},
-	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^15+a1*2^11+a2*2^7+a3*2^6+a4*2^5+a5*2^4+(i-1)*2^2+(j-1);
-
-	If[specialQ,
-		X[a_] := -Sum[X[Quotient[a,2^4]*2^4 + 5 k],{k,0,NN-2}]/;Mod[a-(NN-1)*2^2-(NN-1),2^4]==0;
+	Log2NN=Log[2,NN]//Ceiling;
+	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^(2*Log2NN+11)+a1*2^(2*Log2NN+7)+a2*2^(2*Log2NN+3)+a3*2^(2*Log2NN+2)+a4*2^(2*Log2NN+1)+a5*2^(2*Log2NN)+(i-1)*2^Log2NN+(j-1);
+	fp[a_]:=Quotient[a,2^(2*Log2NN+11)];
+	nz1[a_]:=Quotient[Mod[a,2^(2*Log2NN+11)],2^(2*Log2NN+7)];
+	nz2[a_]:=Quotient[Mod[a,2^(2*Log2NN+7)],2^(2*Log2NN+3)];
+	n\[Theta]1[a_]:=Quotient[Mod[a,2^(2*Log2NN+3)],2^(2*Log2NN+2)];
+	n\[Theta]2[a_]:=Quotient[Mod[a,2^(2*Log2NN+2)],2^(2*Log2NN+1)];
+	n\[Theta]3[a_]:=Quotient[Mod[a,2^(2*Log2NN+1)],2^(2*Log2NN)];
+	mati[a_]:=Quotient[Mod[a,2^(2*Log2NN)],2^Log2NN]+1;
+	matj[a_]:=Mod[a,2^Log2NN]+1;
+	
+	If[specialQ&&(!spQ),
+		X[a_] := -Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]/;mati[a]==NN&&matj[a]==NN;
 	];
-	X[a_]:=0/;Quotient[a,2^5]==2^10;
+	If[spQ,
+		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2>=matj[a];
+		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]-NN/2]]/;NN/2<mati[a]&&NN/2>=matj[a]&&mati[a]-NN/2>matj[a];
+		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]-NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2<matj[a]&&mati[a]+NN/2>matj[a];
+	];
+	If[soQ,
+		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a],mati[a]]]/;mati[a]>matj[a];
+		X[a_] := 0/;mati[a]==matj[a];
+	];
+	X[a_]:=0/;nz1[a]==0&&nz2[a]==0&&n\[Theta]1[a]==0&&n\[Theta]2[a]==0&&n\[Theta]3[a]==0;
 
 	Grading[ a_Plus ] := Max @@ (Grading /@ (List @@ a));
 	Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));
@@ -85,7 +103,16 @@ MultiTraceChargeList[charges_] := Module[{level,filename},
 
 MaxDeg[charges_] := Plus@@charges;
 
-AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+Which[
+	su122Q || su121Q, AllDegs[charges_] := (Outer@@Join[{f},
+		If[minDeg <= #[[5]] <= MaxDeg[#],
+			{#[[5]]}
+		,
+			{}
+		]
+	&/@charges]//Flatten)/.f[x___]:>{x};,
+	True, AllDegs[charges_] := (Outer@@Join[{f},Range[minDeg,#]&/@(MaxDeg[#]&/@charges)]//Flatten)/.f[x___]:>{x};
+];
 
 AllDegs[charges_,degree_] := Select[AllDegs[charges],Total[#]==degree&];
 

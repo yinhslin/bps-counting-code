@@ -6,7 +6,6 @@ multitraceX.m is used in place of multitrace.m (DEPRECIATED) if multitracecharge
 
 multitraceZ.m parallelizes multitraceX.m such that each job runs a subset of charges in multitracechargelist
 multitraceY.m then collects those separate results and combine them into one file
-Y and Z also have not implemented SO and Sp
 
 countX.m and cohomologyX.m are used in place of count.m and cohomology.m if we do not care about gravitons vs non-gravitons
 I don't think we care about Y and Z for count and cohomology
