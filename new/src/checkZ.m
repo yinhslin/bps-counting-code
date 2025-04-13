@@ -34,6 +34,7 @@ maxLevel = param["lmax"] // ToExpression;
 ind = param["i"] // ToExpression;
 If[ind === Null, ind = 1];
 type = param["t"];
+Print["\n\nBEGIN "<>type<>"\n"];
 perm = param["p"];
 If[perm === Null, perm = False, perm = True];
 delete = param["d"];
