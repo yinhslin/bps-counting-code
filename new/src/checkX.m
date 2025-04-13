@@ -40,6 +40,10 @@ delete = param["d"];
 If[delete === Null, delete = False, delete = True];
 schurQ = param["sch"] // ToExpression;
 If[schurQ === Null, schurQ = False, schurQ = True];
+su122Q = param["su122"] // ToExpression;
+If[su122Q === Null, su122Q = False, su122Q = True];
+su121Q = param["su121"] // ToExpression;
+If[su121Q === Null, su121Q = False, su121Q = True];
 
 user = $Username;
 home = Switch[user,

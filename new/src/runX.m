@@ -25,6 +25,10 @@ param[flag_] := Module[
 NN = param["N"] // ToExpression;
 specialQ = param["u"] // ToExpression;
 If[specialQ === Null, specialQ = True, specialQ = False];
+soQ = param["so"] // ToExpression;
+If[soQ === Null, soQ = False, soQ = True];
+spQ = param["sp"] // ToExpression;
+If[spQ === Null, spQ = False, spQ = True];
 level = param["l"] // ToExpression;
 ind = param["i"] // ToExpression;
 time = param["t"] // ToExpression;
@@ -44,21 +48,33 @@ schurQ = param["sch"] // ToExpression;
 If[schurQ === Null, schurQ = False, schurQ = True];
 su122Q = param["su122"] // ToExpression;
 If[su122Q === Null, su122Q = False, su122Q = True];
+su121Q = param["su121"] // ToExpression;
+If[su121Q === Null, su121Q = False, su121Q = True];
 
 
 user = $Username;
 home = Switch[user,
 	"zhangqim",
-		If[specialQ,
-			GetEnvironment["SCRATCH"][[2]]<>"/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-			,
+		Which[
+			spQ,
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
 			GetEnvironment["SCRATCH"][[2]]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
 	_,
-		If[specialQ,
-			Directory[]<>"/bps/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-			,
+		Which[
+			spQ,
+			Directory[]<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			Directory[]<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			Directory[]<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
 			Directory[]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 ];
