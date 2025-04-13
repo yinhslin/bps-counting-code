@@ -192,7 +192,8 @@ If[numKernels === Null,
 (*Independence*)
 
 
-CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
+CollectTermsPre[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
+CollectTerms[lis_]:=Join[{UnTimes[]},CollectTermsPre[lis]];
 
 (* CM *)
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];

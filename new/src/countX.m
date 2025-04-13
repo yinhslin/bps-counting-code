@@ -241,7 +241,8 @@ If[numKernels === Null,
 (*Independence*)
 
 
-CollectTerms[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
+CollectTermsPre[lis_]:=DeleteCases[DeleteDuplicates[Flatten[lis/.Plus->List/.{n_ a_:>a/;NumericQ[n]}/.{-a_:>a}]],0];
+CollectTerms[lis_]:=Join[{UnTimes[]},CollectTermsPre[lis]];
 
 (* CM *)
 UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
@@ -250,7 +251,9 @@ IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{0,{},{}},
 		reducedTraces=traces/.Times->UnTimes;
 		Print["begin collect"];
+		(*Print[reducedTraces];*)
 		Allterms=CollectTerms[reducedTraces];
+		(*Print[Allterms];*)
 		Print["end collect"];
 		Print["begin coefficient array"];
 		CoVector=CoefficientArrays[reducedTraces,Allterms][[2]];
