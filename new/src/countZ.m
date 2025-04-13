@@ -203,7 +203,7 @@ UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{0,{},{}},
-		reducedTraces=traces/.Times->UnTimes;
+		reducedTraces=traces/.Times->UnTimes/.Power->UnPower;
 		Print["begin collect"];
 		Allterms=CollectTerms[reducedTraces];
 		Print["end collect"];
@@ -213,7 +213,7 @@ IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 		Print["begin reduce"];
 		SimpVector = CoVector//MyRowReduce;
 		Print["end reduce"];
-		{SimpVector , Allterms/.UnTimes->Times, CoVector}
+		{SimpVector , Allterms/.UnTimes->Times/.UnPower->Power, CoVector}
 	]
 ];
 
@@ -226,7 +226,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 		{t,Allterms}
 	];
 	Print["end Q"];
-	QStuff = QStuff/.Times->UnTimes;
+	QStuff = QStuff/.Times->UnTimes/.Power->UnPower;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.](*/.Times->UnTimes*);
 	If[reducedQStuff==={},
 	{0,{}}
@@ -247,7 +247,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	Print[Dimensions[tmp]];
 	
 	Print["begin reduce"];
-	{tmp // MyRowReduce, AllQTerms/.UnTimes->Times}
+	{tmp // MyRowReduce, AllQTerms/.UnTimes->Times/.UnPower->Power}
 	
 	(*{SparseArray[Chop[SimpVector . Qmatrix ]]//MyRowReduce, AllQTerms/.UnTimes->Times}*)
 	]

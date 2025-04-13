@@ -199,7 +199,7 @@ UnTimes[n_,a__]:=n UnTimes[a]/;NumericQ[n];
 UnTimes[a_]:=a;
 IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 	If[traces=={},{0,{},{}},
-		reducedTraces=traces/.Times->UnTimes;
+		reducedTraces=traces/.Times->UnTimes/.Power->UnPower;
 		Print["begin collect"];
 		Allterms=CollectTerms[reducedTraces];
 		Print["end collect"];
@@ -209,7 +209,7 @@ IndStuff[traces_]:=Module[{Allterms,reducedTraces,CoVector,SimpVector},
 		Print["begin reduce"];
 		SimpVector = CoVector//MyRowReduce;
 		Print["end reduce"];
-		{SimpVector , Allterms/.UnTimes->Times, CoVector}
+		{SimpVector , Allterms/.UnTimes->Times/.UnPower->Power, CoVector}
 	]
 ];
 
@@ -222,7 +222,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 		{t,Allterms}
 	];
 	Print["end Q"];
-	QStuff = QStuff/.Times->UnTimes;
+	QStuff = QStuff/.Times->UnTimes/.Power->UnPower;
 	reducedQStuff = DeleteCases[DeleteCases[QStuff,0],0.](*/.Times->UnTimes*);
 	If[reducedQStuff==={},
 	{0,{}}
@@ -243,7 +243,7 @@ ActQ[SimpVector_,Allterms_] :=Module[{QStuff,reducedQStuff,Qmatrix,AllQTerms},
 	Print[Dimensions[tmp]];
 	
 	Print["begin reduce"];
-	{tmp // MyRowReduce, AllQTerms/.UnTimes->Times}
+	{tmp // MyRowReduce, AllQTerms/.UnTimes->Times/.UnPower->Power}
 	
 	(*{SparseArray[Chop[SimpVector . Qmatrix ]]//MyRowReduce, AllQTerms/.UnTimes->Times}*)
 	]
@@ -274,11 +274,11 @@ CountQ[charges_,degree_,NN_] := Module[{bare,ind,Qbare,Qind,grav,Allterms,SimpQV
 	
 	(*
 	grav = DeleteCases[DeleteCases[MultiGraviton[charges,degree+1,NN],0],0.];
-	grav = grav/.Times->UnTimes;
+	grav = grav/.Times->UnTimes/.Power->UnPower;
 	If[grav=={},
 		Return[Flatten[ {(*charges, degree, NN,*) Length[ind[[1]]]-Length[Qind[[1]]], Length[Qind[[1]]], 0} ]]
 	];
-	Allterms = DeleteDuplicates[Join[Qind[[2]],CollectTerms[grav]/.UnTimes->Times]]/.Times->UnTimes;
+	Allterms = DeleteDuplicates[Join[Qind[[2]],CollectTerms[grav]/.UnTimes->Times/.UnPower->Power]]/.Times->UnTimes/.Power->UnPower;
 	SimpQVector = SparseArray[Qind[[1]],{Length[Qind[[1]]],Length[Allterms]}];
 	gravCoVector = CoefficientArrays[grav,Allterms][[2]];
 	SimpVector = DeleteCases[Join[SimpQVector,gravCoVector]//MyRowReduce,Table[0,Length[gravCoVector[[1]]]]];
