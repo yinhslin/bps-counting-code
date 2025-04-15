@@ -140,7 +140,9 @@ Which[schurQ,
 	levelvector={3,3,2,2,2};
 ];
 
-If[numKernels === Null, table=Table; do=Do;, table=ParallelTable; do=ParallelDo;];
+pTable[expr_,iter_]:=ParallelTable[expr,iter,Mathod->"FinestGrained"];
+pDo[expr_,iter_]:=ParallelDo[expr,iter,Mathod->"FinestGrained"];
+If[numKernels === Null, table=Table; do=Do;, table=pTable; do=pDo;];
 
 InitiateKernels[] := Module[{},
 	Check[
