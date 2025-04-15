@@ -139,18 +139,9 @@ Which[schurQ,
 	levelvector={3,3,2,2,2};
 ];
 
-SetAttributes[pTable,HoldAll];
-SetAttributes[pDo,HoldAll];
-pTable[expr_,iter__]:=Module[{held},
-	held=Hold[expr];ParallelTable[ReleaseHold[held],
-	iter,
-	Method->"FinestGrained"]
-];
-pDo[expr_,iter__]:=Module[{held},
-	held=Hold[expr];ParallelDo[ReleaseHold[held],
-	iter,
-	Method->"FinestGrained"]
-];
+SetAttributes[{pTable,pDo},HoldAll];
+pTable[expr_,iter__] := ParallelTable[ReleaseHold[Hold[expr]],iter,Method->"FinestGrained"];
+pDo[expr_,iter__] := ParallelDo[ReleaseHold[Hold[expr]],iter,Method->"FinestGrained"];
 If[numKernels === Null, table=Table; do=Do;, table=pTable; do=pDo;];
 
 InitiateKernels[] := Module[{},
