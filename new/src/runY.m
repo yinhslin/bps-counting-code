@@ -79,6 +79,18 @@ home = Switch[user,
 			"/home/ccm/SCRATCH"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
+	"a0s001729",
+		Which[
+			spQ,
+			"~/SCRATCH"<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			"~/SCRATCH"<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			"~/SCRATCH"<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
+			"~/SCRATCH"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
+		]
+	,
 	_,
 		Which[
 			spQ,
