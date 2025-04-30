@@ -275,7 +275,6 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 ];*)
 
 
-
 (* ::Section:: *)
 (*Execute*)
 
