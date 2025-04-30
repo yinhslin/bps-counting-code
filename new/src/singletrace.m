@@ -239,6 +239,42 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 	DeleteCases[ans,0]
 ];
 
+(*SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
+	sn = SingleNecklaces[singleTraceCharge,degree];
+	Print["length: ", Length[sn]];
+	If[Length[sn]>0,
+		do[
+			subfilename = filename<>"-"<>ToString[i]<>".mx";
+			healthy = True;
+			Check[
+					Get[subfilename];
+					If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
+				,
+					healthy = False;
+			];
+			If[!healthy,
+				singleTrace[singleTraceCharge,degree,NN] = MonoCharge[tmp[[i]],NN];
+				DumpSave[subfilename,singleTrace];
+			];
+			ClearAll[singleTrace];
+		,
+			{i,1,Length[sn]}
+		];
+		ans = {};
+		Do[
+			Get[filename<>"-"<>ToString[i]<>".mx"];
+			ans = Join[ans,singleTrace[singleTraceCharge,degree,NN]];
+			ClearAll[singleTrace];
+		,
+			{i,0,Length[sn]}
+		];
+	,
+		ans = {};
+	];
+	DeleteCases[ans,0]
+];*)
+
+
 
 (* ::Section:: *)
 (*Execute*)
