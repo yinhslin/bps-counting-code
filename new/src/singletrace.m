@@ -207,6 +207,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 			If[!healthy,
 				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
 				ans = table[
+					Print["Runing the "<>ToString[i]<>"-th job by kernel "<>ToString[$KernelID]];
 					MonoCharge[tmp[[i]],NN]
 				,
 					{i,1,Length[tmp]}
