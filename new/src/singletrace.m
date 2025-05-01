@@ -214,7 +214,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 						DateString[{"Year","-","Month","-","Day"," ","Hour",":","Minute",":","Second"}],
 							"  Done: ",Sort[donelist],
 							"  Working: ",Sort[Complement[worklist,donelist]],
-							"  Remaining: ",Complement[Range[Length[tmp]],worklist[[;;,2]]]
+							"  Remaining: ",Complement[Range[Length[tmp]],worklist[[;;,1]]]
 						];
 						, 600
 				];
