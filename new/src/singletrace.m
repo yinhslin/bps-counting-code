@@ -186,7 +186,7 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
+SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy,donelist,worklist,statusTask,res},
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
@@ -206,12 +206,29 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 			];
 			If[!healthy,
 				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
+				SetSharedVariable[donelist,worklist];
+				worklist = {};
+				donelist = {};
+				statusTask = CreateScheduledTask[
+					Print[
+						DateString[{"Year","-","Month","-","Day"," ","Hour",":","Minute",":","Second"}],
+							"  Done: ",Sort[donelist],
+							"  Working: ",Sort[Complement[worklist,donelist]],
+							"  Remaining: ",Complement[Range[Length[tmp]],worklist[[;;,2]]]
+						];
+						, 600
+				];
+				StartScheduledTask[statusTask];
 				ans = table[
-					Print["Runing the "<>ToString[i]<>"-th job by kernel "<>ToString[$KernelID]];
-					MonoCharge[tmp[[i]],NN]
+					AppendTo[worklist,{i,$KernelID}];
+					res = MonoCharge[tmp[[i]],NN];
+					AppendTo[donelist,{i,$KernelID}];
+					res	
 				,
 					{i,1,Length[tmp]}
 				];
+				StopScheduledTask[statusTask];
+				RemoveScheduledTask[statusTask];
 				singleTrace[singleTraceCharge,degree,NN] = ans;
 				DumpSave[subfilename,singleTrace];
 			];
