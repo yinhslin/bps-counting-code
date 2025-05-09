@@ -206,7 +206,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 			];
 			If[!healthy,
 				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
-				SetSharedVariable[donelist,worklist];
+				(*SetSharedVariable[donelist,worklist];
 				worklist = {};
 				donelist = {};
 				statusTask = CreateScheduledTask[
@@ -217,18 +217,18 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 							"  Remaining: ",Complement[Range[Length[tmp]],worklist[[;;,1]]]
 						];
 						, 600
-				];
+				];*)
 				StartScheduledTask[statusTask];
 				ans = table[
-					AppendTo[worklist,{i,$KernelID}];
+					(*AppendTo[worklist,{i,$KernelID}];*)
 					res = MonoCharge[tmp[[i]],NN];
-					AppendTo[donelist,{i,$KernelID}];
+					(*AppendTo[donelist,{i,$KernelID}];*)
 					res	
 				,
 					{i,1,Length[tmp]}
 				];
-				StopScheduledTask[statusTask];
-				RemoveScheduledTask[statusTask];
+				(*StopScheduledTask[statusTask];
+				RemoveScheduledTask[statusTask];*)
 				singleTrace[singleTraceCharge,degree,NN] = ans;
 				DumpSave[subfilename,singleTrace];
 			];
