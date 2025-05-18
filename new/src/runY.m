@@ -67,40 +67,16 @@ home = Switch[user,
 			GetEnvironment["SCRATCH"][[2]]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
-	"ccm",
-		Which[
-			spQ,
-			"/home/ccm/SCRATCH"<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			soQ,
-			"/home/ccm/SCRATCH"<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			specialQ,
-			"/home/ccm/SCRATCH"<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			!specialQ,
-			"/home/ccm/SCRATCH"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-		]
-	,
 	"a0s001729",
 		Which[
 			spQ,
-			"~/SCRATCH"<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
 			soQ,
-			"~/SCRATCH"<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
 			specialQ,
-			"~/SCRATCH"<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
 			!specialQ,
-			"~/SCRATCH"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
-		]
-	,
-	"accwb3cqx1",
-		Which[
-			spQ,
-			"~/SCRATCH"<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			soQ,
-			"~/SCRATCH"<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			specialQ,
-			"~/SCRATCH"<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
-			!specialQ,
-			"~/SCRATCH"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
+			GetEnvironment["SCRATCH"][[2]]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
 	_,

@@ -217,8 +217,8 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 							"  Remaining: ",Complement[Range[Length[tmp]],worklist[[;;,1]]]
 						];
 						, 600
-				];*)
-				StartScheduledTask[statusTask];
+				];
+				StartScheduledTask[statusTask];*)
 				ans = table[
 					(*AppendTo[worklist,{i,$KernelID}];*)
 					res = MonoCharge[tmp[[i]],NN];
