@@ -192,7 +192,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,s
 	If[Length[sn]>0,
 		cpt = {};
 		SetSharedVariable[cpt];
-		maxMem = 2^37;
+		maxMem = 2^32;
 		do[
 			subfilename = filename<>"-"<>ToString[i]<>".mx";
 			healthy = True;
@@ -202,24 +202,27 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,s
 					If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
 				,
 					healthy = False;
+					DeleteFile[subfilename];
+					ClearAll[singleTrace];
+					Print["Bad file: ",i];
 				];
 			,
 				healthy = False
 			];
 			If[healthy, Append[cpt,i];, cpt = DeleteCases[cpt, i]; ];
 			If[!healthy,
-				Print[DateString[]<>", Begin: job ", i];
+				(*Print[DateString[]<>", Begin: job ", i];*)
 				MemoryConstrained[ 
 					singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
 					Append[cpt,i];
+					healthy = True;
 				,
 					maxMem
 				,
-					singleTrace[singleTraceCharge,degree,NN] = Null;
 					Print["job ",i," failed."];
 				];
-				Print[DateString[]<>", End: job ", i];
-				If[ singleTrace[singleTraceCharge,degree,NN] != Null,
+				(*Print[DateString[]<>", End: job ", i];*)
+				If[ healthy,
 					DumpSave[subfilename,singleTrace];
 				];
 			];
