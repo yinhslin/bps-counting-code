@@ -192,7 +192,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,s
 	If[Length[sn]>0,
 		cpt = {};
 		SetSharedVariable[cpt];
-		maxMem = 2^40;
+		maxMem = 2^37;
 		do[
 			subfilename = filename<>"-"<>ToString[i]<>".mx";
 			healthy = True;
