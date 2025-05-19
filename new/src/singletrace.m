@@ -186,7 +186,60 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy,donelist,worklist,statusTask,res},
+SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,subfilename,healthy,ans},
+	sn = SingleNecklaces[singleTraceCharge,degree];
+	Print["length: ", Length[sn]];
+	If[Length[sn]>0,
+		cpt = {};
+		SetSharedVariable[cpt];
+		maxMem = 2^40;
+		do[
+			subfilename = filename<>"-"<>ToString[i]<>".mx";
+			healthy = True;
+			If[FileExistsQ[subfilename],
+				Check[
+					Get[subfilename];
+					If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
+				,
+					healthy = False;
+				];
+			,
+				healthy = False
+			];
+			If[healthy, Append[cpt,i];, cpt = DeleteCases[cpt, i]; ];
+			If[!healthy,
+				MemoryConstrained[ singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };Append[cpt,i];, maxMem, singleTrace[singleTraceCharge,degree,NN] = Null;];
+				If[ singleTrace[singleTraceCharge,degree,NN] != Null,
+					DumpSave[subfilename,singleTrace];
+				];
+			];
+			ClearAll[singleTrace];
+			,
+			{i,1,Length[sn]}
+		];
+		If[Length[cpt]==Length[sn],
+			ans = {};
+			Do[
+				Get[filename<>"-"<>ToString[i]<>".mx"];
+				ans = Join[ans,singleTrace[singleTraceCharge,degree,NN]];
+				ClearAll[singleTrace];
+				,
+				{i,1,Length[sn]}
+			];
+			DeleteFile[#] &/@ FileNames[filename<>"-*"];
+		];
+		Assert[Length[ans]==Length[sn]];
+		(*If[Length[ans]=!=Length[sn],
+			Print[ans];
+			Print[Length[ans]];
+		];*)
+	,
+		ans = {};
+	];
+	DeleteCases[ans,0]
+];
+
+(*SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy,donelist,worklist,statusTask,res},
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
@@ -254,7 +307,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,
 		ans = {};
 	];
 	DeleteCases[ans,0]
-];
+];*)
 
 (*SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
 	sn = SingleNecklaces[singleTraceCharge,degree];
