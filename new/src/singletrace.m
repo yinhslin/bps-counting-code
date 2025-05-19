@@ -208,9 +208,17 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,s
 			];
 			If[healthy, Append[cpt,i];, cpt = DeleteCases[cpt, i]; ];
 			If[!healthy,
-				Print[DateString[]<>", Begin: job ", i," by kernel ",$KernelID ];
-				MemoryConstrained[ singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };Append[cpt,i];, maxMem, singleTrace[singleTraceCharge,degree,NN] = Null;];
-				Print[DateString[]<>", End: job ", i," by kernel ",$KernelID ];
+				Print[DateString[]<>", Begin: job ", i];
+				MemoryConstrained[ 
+					singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
+					Append[cpt,i];
+				,
+					maxMem
+				,
+					singleTrace[singleTraceCharge,degree,NN] = Null;
+					Print["job ",i," failed."];
+				];
+				Print[DateString[]<>", End: job ", i];
 				If[ singleTrace[singleTraceCharge,degree,NN] != Null,
 					DumpSave[subfilename,singleTrace];
 				];
