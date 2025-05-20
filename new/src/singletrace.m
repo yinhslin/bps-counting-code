@@ -186,51 +186,94 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,subfilename,healthy,ans},
+SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,menUsed,totMenUsed,maxMem,maxTotMem,bigmen,finish,bigmenfilename,subfilename,healthy,ans},
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
-		cpt = {};
-		SetSharedVariable[cpt];
-		maxMem = 2^32;
-		do[
-			subfilename = filename<>"-"<>ToString[i]<>".mx";
-			healthy = True;
-			If[FileExistsQ[subfilename],
-				Check[
-					Get[subfilename];
-					If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
-				,
-					healthy = False;
-					DeleteFile[subfilename];
-					ClearAll[singleTrace];
-					Print["Bad file: ",i];
-				];
+		(*menUsed = Table[0,{i,1,numKernels}];
+		totMenUsed = 0;
+		maxTotMem = 240 * 10^9;*)
+		maxMem = 2 * 10^9 ;
+		bigmenfilename = filename<>"_bigmen.mx";
+		If[FileExistsQ[bigmenfilename],
+			Get[bigmenfilename];
+			bigmen = bigmemsave;
 			,
-				healthy = False
-			];
-			If[healthy, Append[cpt,i];, cpt = DeleteCases[cpt, i]; ];
-			If[!healthy,
-				(*Print[DateString[]<>", Begin: job ", i];*)
-				MemoryConstrained[ 
-					singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
-					Append[cpt,i];
-					healthy = True;
-				,
-					maxMem
-				,
-					Print["job ",i," failed."];
-				];
-				(*Print[DateString[]<>", End: job ", i];*)
-				If[ healthy,
-					DumpSave[subfilename,singleTrace];
-				];
-			];
-			ClearAll[singleTrace];
-			,
-			{i,1,Length[sn]}
+			bigmen = {};
 		];
-		If[Length[cpt]==Length[sn],
+		SetSharedVariable[bigmen];
+		ParallelEvaluate[$HistoryLength = 0;];
+		finish = False;
+		While[ !finish ,
+			CheckAbort[
+				do[
+					(*menUsed[[$KernelID]] = MemoryInUse[];
+					If[Total[menUsed] > totMenUsed + 10^8,
+						totMenUsed = Total[menUsed]; 
+						Print["Total memory in used: ",totMenUsed];
+					];*)
+					(*If[Total[menUsed] > maxTotMem, (*Abort[]*) Null];*)
+					If[
+						MemoryAvailable[] < 100 * maxMem
+						,
+						Print["Memory Available: ",MemoryAvailable[]," Stop Kernel: ",$KernelID," Job: ",i];
+						Abort[];
+						Abort[];
+						Abort[];
+					];
+					subfilename = filename<>"-"<>ToString[i]<>".mx";
+					healthy = True;
+					If[FileExistsQ[subfilename],
+						Check[
+							Get[subfilename];
+							If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
+						,
+							healthy = False;
+							DeleteFile[subfilename];
+							ClearAll[singleTrace];
+							Print["Bad file: ",i];
+						];
+					,
+						healthy = False
+					];
+					If[!healthy,
+						(*Print[DateString[]<>", Begin: job ", i];*)
+						MemoryConstrained[ 
+							singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
+							healthy = True;
+						,
+							maxMem
+						,
+							Print["job ",i," failed."," Memory Available: ",MemoryAvailable[]];
+							AppendTo[bigmen,i];
+							bigmemsave = bigmen;
+							DumpSave[bigmenfilename,bigmemsave];
+							healthy = False;
+						];
+						(*Print[DateString[]<>", End: job ", i];*)
+						If[ healthy,
+							DumpSave[subfilename,singleTrace];
+						];
+					];
+					ClearAll[singleTrace,bigmemsave];
+					(*Print[MemoryAvailable[]];*)
+					(*ClearAll[CreateWord, fp, GetFermions, GetGradeds, GExpandRule, grade, Grading, index, Log2NN, MonoCharge, NonCommutativeMultiplyRules, nz1, nz2, n\[Theta]1, n\[Theta]2, n\[Theta]3, prod, S, TraceP, X, Xlist];
+					(*Print[Names["Global`*"]];*)
+					ClearSystemCache[];
+					Share[];
+					(*Print[MemoryInUse[]];*)
+					Stuff[];*)
+					,
+					{i,Complement[Range[Length[sn]],bigmen]}
+				];
+				finish = True;
+			,
+				finish = False;
+				Print["Reset Kernels."];
+				ResetKernels[];
+			];
+		];
+		If[Length[bigmen]==0,
 			ans = {};
 			Do[
 				Get[filename<>"-"<>ToString[i]<>".mx"];
@@ -239,7 +282,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,cpt,maxMem,s
 				,
 				{i,1,Length[sn]}
 			];
-			DeleteFile[#] &/@ FileNames[filename<>"-*"];
+			(*DeleteFile[#] &/@ FileNames[filename<>"-*"];*)
 		];
 		Assert[Length[ans]==Length[sn]];
 		(*If[Length[ans]=!=Length[sn],
