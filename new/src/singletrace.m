@@ -249,7 +249,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statu
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
-		maxMem = 3 * 2^30 ;
+		maxMem = 6 * 2^30 ;
 		ParallelEvaluate[$HistoryLength = 0;];
 		(*statusTask = CreateScheduledTask[
 			Print["Memory Available: ",MemoryAvailable[]];
