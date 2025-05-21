@@ -219,12 +219,12 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 			(*Print[DateString[]<>", Begin: job ", i];*)
 			MemoryConstrained[ 
 				singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
-				Print["finish job: ",i," Memory Available: ",MemoryAvailable[]];
+				(*Print[Now,"finish job: ",i," Memory Available: ",MemoryAvailable[]];*)
 				healthy = True;
 			,
 				maxMem
 			,
-				Print["job ",i," failed."," Memory Available: ",MemoryAvailable[]];
+				(*Print[Now,"job ",i," failed."," Memory Available: ",MemoryAvailable[]];*)
 				AppendTo[bigmen,i];
 				bigmemsave = bigmen;
 				DumpSave[bigmenfilename,bigmemsave];
