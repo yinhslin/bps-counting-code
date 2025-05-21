@@ -224,7 +224,7 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 			,
 				maxMem
 			,
-				(*Print[Now,"job ",i," failed."," Memory Available: ",MemoryAvailable[]];*)
+				Print[Now,"job ",i," failed."," Memory Available: ",MemoryAvailable[]];
 				AppendTo[bigmen,i];
 				bigmemsave = bigmen;
 				DumpSave[bigmenfilename,bigmemsave];
@@ -241,7 +241,7 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 		Share[];
 		Stuff[];
 		,
-		{i,Complement[Range[Length[sn]],bigmen]}
+		{i,SeedRandom[1];RandomSample[Complement[Range[Length[sn]],bigmen]]}
 	];
 ];
 
@@ -249,7 +249,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statu
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
-		maxMem = 6 * 2^30 ;
+		maxMem = 31 * 2^30 ;
 		ParallelEvaluate[$HistoryLength = 0;];
 		(*statusTask = CreateScheduledTask[
 			Print["Memory Available: ",MemoryAvailable[]];
