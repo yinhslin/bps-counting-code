@@ -186,95 +186,104 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,menUsed,totMenUsed,maxMem,maxTotMem,bigmen,finish,bigmenfilename,subfilename,healthy,ans},
+ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,maxMem_] := Module[{subfilename,healthy,bigmen},
+	If[FileExistsQ[bigmenfilename],
+		Get[bigmenfilename];
+		bigmen = bigmemsave;
+		,
+		bigmen = {};
+	];
+	SetSharedVariable[bigmen];
+	do[
+		(*If[
+			MemoryAvailable[] < 230 * 10^9,
+			Print["Abort Kernel: ", $KernelID," job: ", i];
+			Abort[];
+		];*)
+		subfilename = filename<>"-"<>ToString[i]<>".mx";
+		healthy = True;
+		If[FileExistsQ[subfilename],
+			Check[
+				Get[subfilename];
+				If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
+			,
+				healthy = False;
+				DeleteFile[subfilename];
+				ClearAll[singleTrace];
+				Print["Bad file: ",i];
+			];
+		,
+			healthy = False
+		];
+		If[!healthy,
+			(*Print[DateString[]<>", Begin: job ", i];*)
+			MemoryConstrained[ 
+				singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
+				Print["finish job: ",i," Memory Available: ",MemoryAvailable[]];
+				healthy = True;
+			,
+				maxMem
+			,
+				Print["job ",i," failed."," Memory Available: ",MemoryAvailable[]];
+				AppendTo[bigmen,i];
+				bigmemsave = bigmen;
+				DumpSave[bigmenfilename,bigmemsave];
+				healthy = False;
+			];
+			(*Print[DateString[]<>", End: job ", i];*)
+			If[ healthy,
+				DumpSave[subfilename,singleTrace];
+			];
+		];
+		ClearAll[singleTrace,bigmemsave];
+		ClearAll[CreateWord, fp, GetFermions, GetGradeds, GExpandRule, grade, Grading, index, Log2NN, MonoCharge, NonCommutativeMultiplyRules, nz1, nz2, n\[Theta]1, n\[Theta]2, n\[Theta]3, prod, S, TraceP, X, Xlist];
+		ClearSystemCache[];
+		Share[];
+		Stuff[];
+		,
+		{i,Complement[Range[Length[sn]],bigmen]}
+	];
+];
+
+SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statusTask,bigmenfilename,ans},
 	sn = SingleNecklaces[singleTraceCharge,degree];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
-		(*menUsed = Table[0,{i,1,numKernels}];
-		totMenUsed = 0;
-		maxTotMem = 240 * 10^9;*)
-		maxMem = 2 * 10^9 ;
+		maxMem = 3 * 2^30 ;
+		ParallelEvaluate[$HistoryLength = 0;];
+		(*statusTask = CreateScheduledTask[
+			Print["Memory Available: ",MemoryAvailable[]];
+			If[
+				MemoryAvailable[] < 230 * 10^9
+				,
+				(*Print["Memory Available: ",MemoryAvailable[]];*)
+				Print["Reset Kernels..."];
+				TimeConstrained[
+					CloseKernels[];
+				,
+					60
+				,
+					Print["> cannot close kernels"];
+					Quit[];
+				];
+				Print["> relaunch kernels"];
+				InitiateKernels[];
+				(*ComputeSingleTrace[singleTraceCharge,degree,NN,filename,sn,maxMem];*)
+			];
+			, 
+			60
+		];
+		StartScheduledTask[statusTask];*)
 		bigmenfilename = filename<>"_bigmen.mx";
+		ComputeSingleTrace[singleTraceCharge,degree,NN,filename,bigmenfilename,sn,maxMem];
+		Print["done"];
 		If[FileExistsQ[bigmenfilename],
 			Get[bigmenfilename];
-			bigmen = bigmemsave;
-			,
-			bigmen = {};
+		,
+			bigmemsave = {Length[sn]};
 		];
-		SetSharedVariable[bigmen];
-		ParallelEvaluate[$HistoryLength = 0;];
-		finish = False;
-		While[ !finish ,
-			CheckAbort[
-				do[
-					(*menUsed[[$KernelID]] = MemoryInUse[];
-					If[Total[menUsed] > totMenUsed + 10^8,
-						totMenUsed = Total[menUsed]; 
-						Print["Total memory in used: ",totMenUsed];
-					];*)
-					(*If[Total[menUsed] > maxTotMem, (*Abort[]*) Null];*)
-					If[
-						MemoryAvailable[] < 100 * maxMem
-						,
-						Print["Memory Available: ",MemoryAvailable[]," Stop Kernel: ",$KernelID," Job: ",i];
-						Abort[];
-						Abort[];
-						Abort[];
-					];
-					subfilename = filename<>"-"<>ToString[i]<>".mx";
-					healthy = True;
-					If[FileExistsQ[subfilename],
-						Check[
-							Get[subfilename];
-							If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
-						,
-							healthy = False;
-							DeleteFile[subfilename];
-							ClearAll[singleTrace];
-							Print["Bad file: ",i];
-						];
-					,
-						healthy = False
-					];
-					If[!healthy,
-						(*Print[DateString[]<>", Begin: job ", i];*)
-						MemoryConstrained[ 
-							singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
-							healthy = True;
-						,
-							maxMem
-						,
-							Print["job ",i," failed."," Memory Available: ",MemoryAvailable[]];
-							AppendTo[bigmen,i];
-							bigmemsave = bigmen;
-							DumpSave[bigmenfilename,bigmemsave];
-							healthy = False;
-						];
-						(*Print[DateString[]<>", End: job ", i];*)
-						If[ healthy,
-							DumpSave[subfilename,singleTrace];
-						];
-					];
-					ClearAll[singleTrace,bigmemsave];
-					(*Print[MemoryAvailable[]];*)
-					(*ClearAll[CreateWord, fp, GetFermions, GetGradeds, GExpandRule, grade, Grading, index, Log2NN, MonoCharge, NonCommutativeMultiplyRules, nz1, nz2, n\[Theta]1, n\[Theta]2, n\[Theta]3, prod, S, TraceP, X, Xlist];
-					(*Print[Names["Global`*"]];*)
-					ClearSystemCache[];
-					Share[];
-					(*Print[MemoryInUse[]];*)
-					Stuff[];*)
-					,
-					{i,Complement[Range[Length[sn]],bigmen]}
-				];
-				finish = True;
-			,
-				finish = False;
-				Print["Reset Kernels."];
-				ResetKernels[];
-			];
-		];
-		If[Length[bigmen]==0,
-			ans = {};
+		ans = {};
+		If[Length[bigmemsave]==0,
 			Do[
 				Get[filename<>"-"<>ToString[i]<>".mx"];
 				ans = Join[ans,singleTrace[singleTraceCharge,degree,NN]];
