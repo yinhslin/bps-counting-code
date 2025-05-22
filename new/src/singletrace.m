@@ -186,20 +186,22 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,maxMem_] := Module[{subfilename,healthy,bigmen},
+ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,maxMem_] := Module[{subfilename,healthy,bigmen,statusTask,workinglist},
 	If[FileExistsQ[bigmenfilename],
 		Get[bigmenfilename];
 		bigmen = bigmemsave;
 		,
 		bigmen = {};
 	];
-	SetSharedVariable[bigmen];
+	workinglist = {};
+	statusTask = CreateScheduledTask[
+			Print[DateString[],", Memory Available: ",MemoryAvailable[],", Working Kernels: ",Sort[workinglist]];
+			, 
+			3600
+	];
+	StartScheduledTask[statusTask];
+	SetSharedVariable[bigmen,workinglist];
 	do[
-		(*If[
-			MemoryAvailable[] < 230 * 10^9,
-			Print["Abort Kernel: ", $KernelID," job: ", i];
-			Abort[];
-		];*)
 		subfilename = filename<>"-"<>ToString[i]<>".mx";
 		healthy = True;
 		If[FileExistsQ[subfilename],
@@ -217,6 +219,7 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 		];
 		If[!healthy,
 			(*Print[DateString[]<>", Begin: job ", i];*)
+			AppendTo[workinglist,{$KernelID,i}];
 			MemoryConstrained[ 
 				singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
 				(*Print[Now,"finish job: ",i," Memory Available: ",MemoryAvailable[]];*)
@@ -224,12 +227,13 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 			,
 				maxMem
 			,
-				Print[Now,"job ",i," failed."," Memory Available: ",MemoryAvailable[]];
+				Print[DateString[Now]," job ",i," failed."," Memory Available: ",MemoryAvailable[]];
 				AppendTo[bigmen,i];
 				bigmemsave = bigmen;
 				DumpSave[bigmenfilename,bigmemsave];
 				healthy = False;
 			];
+			workinglist = DeleteCases[workinglist,{$KernelID,i}];
 			(*Print[DateString[]<>", End: job ", i];*)
 			If[ healthy,
 				DumpSave[subfilename,singleTrace];
@@ -243,6 +247,7 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 		,
 		{i,SeedRandom[1];RandomSample[Complement[Range[Length[sn]],bigmen]]}
 	];
+	RemoveScheduledTask[statusTask];
 ];
 
 SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statusTask,bigmenfilename,ans},
