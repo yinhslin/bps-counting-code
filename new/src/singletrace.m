@@ -285,7 +285,7 @@ SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statu
 		If[FileExistsQ[bigmenfilename],
 			Get[bigmenfilename];
 		,
-			bigmemsave = {Length[sn]};
+			bigmemsave = {};
 		];
 		ans = {};
 		If[Length[bigmemsave]==0,
