@@ -245,7 +245,7 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 		Share[];
 		Stuff[];
 		,
-		{i,SeedRandom[1];RandomSample[Complement[Range[Length[sn]],bigmen]]}
+		{i,SeedRandom[1];Reverse[RandomSample[Complement[Range[Length[sn]],bigmen]]]}
 	];
 	RemoveScheduledTask[statusTask];
 ];

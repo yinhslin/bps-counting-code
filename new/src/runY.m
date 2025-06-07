@@ -81,6 +81,18 @@ home = Switch[user,
 			GetEnvironment["SCRATCH"][[2]]<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
 		]
 	,
+	"a6s001997",
+		Which[
+			spQ,
+			"/public3/home/a6s001997/scratch"<>"/bps_sp/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			soQ,
+			"/public3/home/a6s001997/scratch"<>"/bps_so/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			specialQ,
+			"/public3/home/a6s001997/scratch"<>"/bps_su/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"],
+			!specialQ,
+			"/public3/home/a6s001997/scratch"<>"/bps_u/"<>Which[schurQ, "schur/", su122Q, "su122/", su121Q, "su121/", True, "all/"]
+		]
+	,
 	_,
 		Which[
 			spQ,
