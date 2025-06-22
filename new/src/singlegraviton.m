@@ -228,6 +228,7 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,t
 			ClearAll[singleGraviton,ans,tmp];
 			cnt+=1;
 		];
+		Print["done computing, start collecting"];
 		tot = cnt-1;
 		ans = {};
 		Do[
