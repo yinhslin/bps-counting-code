@@ -47,6 +47,7 @@ chunk = param["c"] // ToExpression;
 If[chunk === Null, chunk = 10^3];
 memory = param["m"] // ToExpression;
 If[memory === Null, memory = 10^3];
+report = param["r"] // ToExpression;
 schurQ = param["sch"] // ToExpression;
 If[schurQ === Null, schurQ = False, schurQ = True];
 su122Q = param["su122"] // ToExpression;
@@ -212,6 +213,15 @@ Get[job<>".m"];
 
 If[numKernels =!= Null,
 	InitiateKernels[];
+];
+
+If[report =!= Null,
+	statusTask = CreateScheduledTask[
+		Print[DateString[],", Memory Available: ", MemoryAvailable[]];
+		, 
+		report
+	];
+	StartScheduledTask[statusTask];
 ];
 
 
