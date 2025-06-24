@@ -71,7 +71,6 @@ MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace,NN]]);
 PrepData[chargelist_,degree_,N_]:={#[[1]],MonoCharge[#[[2]],N]} &/@ TwoGroupsData[chargelist,degree];
 
 Stuff[] := Module[{},
-	(* index relations *)
 	Log2NN=Log[2,NN]//Ceiling;
 	index[a1_,a2_,a3_,a4_,a5_,i_,j_]:=Mod[a3+a4+a5+1,2]*2^(2*Log2NN+11)+a1*2^(2*Log2NN+7)+a2*2^(2*Log2NN+3)+a3*2^(2*Log2NN+2)+a4*2^(2*Log2NN+1)+a5*2^(2*Log2NN)+(i-1)*2^Log2NN+(j-1);
 	fp[a_]:=Quotient[a,2^(2*Log2NN+11)];
@@ -82,68 +81,9 @@ Stuff[] := Module[{},
 	n\[Theta]3[a_]:=Quotient[Mod[a,2^(2*Log2NN+1)],2^(2*Log2NN)];
 	mati[a_]:=Quotient[Mod[a,2^(2*Log2NN)],2^Log2NN]+1;
 	matj[a_]:=Mod[a,2^Log2NN]+1;
-
-	Unprotect[NonCommutativeMultiply];
-	ClearAll[NonCommutativeMultiply];
-	SetAttributes[NonCommutativeMultiply,Flat];
-	SetAttributes[NonCommutativeMultiply,OneIdentity];
-	Protect[NonCommutativeMultiply];
-
-	DD[i_][a_Plus]:=DD[i][#]&/@a;
-	DD[i_][a_Times]:=Module[{alist,sign,A},
-		alist=Apply[List,a];
-		A=0;
-		If[i>2,
-			sign=1;
-			Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
-				sign=sign (-1)^Grading[alist[[n]]];
-			,{n,alist//Length}];
-		,
-		Do[A=A+ NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
-			,{n,alist//Length}];
-		];
-	A
-	];
-	DD[i_][a_Power]:=DD[i][Expand[a]];
 	
-	DD[i_][n_]:=0/;NumberQ[n];
-	DD[m_][X[a_]^n_]:=n X[a]^(n-1)DD[m][X[a]]/;fp[a]==0;
-(*	DD[m_][X[a_]**b_]:=DD[m][X[a]]**b + X[a]**DD[m][b]/;fp[a]==1&&m<=2;
-	DD[m_][X[a_]**b_]:=DD[m][X[a]] b - X[a]**DD[m][b]/;fp[a]==1&&m>2;*)
-	DD[i_][a_NonCommutativeMultiply]:=Module[{alist,sign,A},
-		alist=Apply[List,a];
-		A=0;
-		If[i>2,
-			sign=1;
-			Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
-				sign=sign (-1)^Grading[alist[[n]]];
-			,{n,alist//Length}];
-		,
-		Do[A=A+ NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
-			,{n,alist//Length}];
-		];
-	A
-	];
-
-(*	DD[m_][X[a_]]:=X[a + Mod[m,2]*2^11 + Mod[m+1,2]*2^7 ]/;m<=2;
-	DD[3][X[a_]]:=X[a + (-1)^fp[a]*2^15 + 2^6 ]/;n\[Theta]1[a]==0;
-	DD[4][X[a_]]:=(-1)^(n\[Theta]1[a]) X[a + (-1)^fp[a]*2^15 + 2^5 ]/;n\[Theta]2[a]==0;
-	DD[5][X[a_]]:=(-1)^(n\[Theta]1[a]+n\[Theta]2[a]) X[a + (-1)^fp[a]*2^15 + 2^4 ]/;n\[Theta]3[a]==0;
-	DD[3][X[a_]]:=0/;n\[Theta]1[a]==1;
-	DD[4][X[a_]]:=0/;n\[Theta]2[a]==1;
-	DD[5][X[a_]]:=0/;n\[Theta]3[a]==1;*)
-	DD[1][X[a_]]:=X[index[nz1[a]+1,nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]];
-	DD[2][X[a_]]:=X[index[nz1[a],nz2[a]+1,n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]];
-	DD[3][X[a_]]:=X[index[nz1[a],nz2[a],n\[Theta]1[a]+1,n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]]/;n\[Theta]1[a]==0;
-	DD[4][X[a_]]:=(-1)^(n\[Theta]1[a]) X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a]+1,n\[Theta]3[a],mati[a],matj[a]]]/;n\[Theta]2[a]==0;
-	DD[5][X[a_]]:=(-1)^(n\[Theta]1[a]+n\[Theta]2[a]) X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a]+1,mati[a],matj[a]]]/;n\[Theta]3[a]==0;
-	DD[3][X[a_]]:=0/;n\[Theta]1[a]==1;
-	DD[4][X[a_]]:=0/;n\[Theta]2[a]==1;
-	DD[5][X[a_]]:=0/;n\[Theta]3[a]==1;
-
-	(* matrix and product *)
 	If[specialQ&&(!spQ),
-		X[a_] := -Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]/;mati[a]==NN&&matj[a]==NN;
+		X[a_] := - Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]/;mati[a]==NN&&matj[a]==NN;
 	];
 	If[spQ,
 		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2>=matj[a];
@@ -161,22 +101,68 @@ Stuff[] := Module[{},
 	Grading[ a_NonCommutativeMultiply ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ _ ] := 0;
 	Grading[ a_X ] := fp[a[[1]]];
+	GetGradeds[a___] := (*GetGradeds[a] =*) Select[{a}, Grading[#] != 0 &];
+	GetFermions[a___] := (*GetFermions[a] =*) Select[{a}, OddQ[Grading[#]] &];
 
 	Unprotect[NonCommutativeMultiply];
 	SetAttributes[NonCommutativeMultiply, Listable];
 	ClearAttributes[NonCommutativeMultiply, Flat];
-	NonCommutativeMultiply[a___, b_NonCommutativeMultiply, c___] := NonCommutativeMultiply[a, Sequence@@b, c];
-	GetGradeds[a___] := (*GetGradeds[a] =*) Select[{a}, Grading[#] != 0 &];
-	GetFermions[a___] := (*GetFermions[a] =*) Select[{a}, OddQ[Grading[#]] &];
-	NonCommutativeMultiply[a___] /; Length[GetGradeds[a]] <= 1 := Times[a];
-	NonCommutativeMultiply[a___] /; !FreeQ[{a}, Times, 2] := NonCommutativeMultiply @@ ReplacePart[ {a}, Sequence, Position[{a}, Times, 2] ];
-	NonCommutativeMultiply[b___, a_, c___, a_, d___] /; OddQ[Grading[a]] := 0;
-	NonCommutativeMultiply[a___] /; (!OrderedQ[GetGradeds[a]] || Length[GetGradeds[a]] != Length[{a}] ) :=
-		Signature[GetFermions[a]] * (Times @@ Select[{a}, !MemberQ[GetGradeds[a], #]&]) * NonCommutativeMultiply @@ Sort[GetGradeds[a]];
 	Protect[NonCommutativeMultiply];
-	GExpand[a_, patt___] := Expand[a //. {x_NonCommutativeMultiply :> Distribute[x]}, patt];
-	ApplyDD[{zlis_,expr_}]:=Module[{tmp},tmp=expr;Do[tmp=Nest[DD[6-r][#] &,tmp,zlis[[6-r]]],{r,1,5}];tmp];
-
+	NonCommutativeMultiplyRules={
+		NonCommutativeMultiply[a___, b_NonCommutativeMultiply, c___] :> NonCommutativeMultiply[a, Sequence@@b, c],
+		NonCommutativeMultiply[a___] /; Length[GetGradeds[a]] <= 1 :> Times[a],
+		NonCommutativeMultiply[a___] /; !FreeQ[{a}, Times, 2] :> NonCommutativeMultiply @@ ReplacePart[ {a}, Sequence, Position[{a}, Times, 2] ],
+		NonCommutativeMultiply[b___, a_, c___, a_, d___] /; OddQ[Grading[a]] :> 0,
+		(*NonCommutativeMultiply[a___] /; (!OrderedQ[GetGradeds[a]] || Length[GetGradeds[a]] != Length[{a}] ) :>
+			Signature[GetFermions[a]] * (Times @@ Select[{a}, !MemberQ[GetGradeds[a], #]&]) * NonCommutativeMultiply @@ Sort[GetGradeds[a]]*)
+		NonCommutativeMultiply[a___] :> Module[{grade},grade=GetGradeds[a];
+			Signature[GetFermions[a]] * (Times @@ Select[{a}, !MemberQ[grade, #]&]) * NonCommutativeMultiply @@ Sort[grade]
+				/; (!OrderedQ[grade] || Length[grade] != Length[{a}] ) ]
+	};
+	GExpandRule = {x_NonCommutativeMultiply :> Distribute[x]};
+	DDRules = {
+		DD[i_][a_Plus] :> (DD[i][#]&)/@a,
+		DD[i_][a_Times] :> Module[{alist,sign,A},
+			alist=Apply[List,a];
+			A=0;
+			If[i>2,
+				sign=1;
+				Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
+					sign=sign (-1)^Grading[alist[[n]]];
+				,{n,alist//Length}];
+			,
+			Do[A=A+ NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
+				,{n,alist//Length}];
+			];
+			A
+		],
+		(*DD[i_][a_Power] :> DD[i][Expand[a]],*)
+		DD[i_][n_] :> 0/;NumberQ[n],
+		DD[m_][X[a_]^n_] :> n X[a]^(n-1)DD[m][X[a]]/;fp[a]==0,
+		DD[i_][a_NonCommutativeMultiply] :> Module[{alist,sign,A},
+			alist=Apply[List,a];
+			A=0;
+			If[i>2,
+				sign=1;
+				Do[A=A+sign NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
+					sign=sign (-1)^Grading[alist[[n]]];
+				,{n,alist//Length}];
+			,
+			Do[A=A+ NonCommutativeMultiply@@(ReplacePart[alist,n->DD[i][alist[[n]]]]);
+				,{n,alist//Length}];
+			];
+			A
+		],
+		DD[1][X[a_]] :> X[index[nz1[a]+1,nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]],
+		DD[2][X[a_]] :> X[index[nz1[a],nz2[a]+1,n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]],
+		DD[3][X[a_]] :> X[index[nz1[a],nz2[a],n\[Theta]1[a]+1,n\[Theta]2[a],n\[Theta]3[a],mati[a],matj[a]]]/;n\[Theta]1[a]==0,
+		DD[4][X[a_]] :> (-1)^(n\[Theta]1[a]) X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a]+1,n\[Theta]3[a],mati[a],matj[a]]]/;n\[Theta]2[a]==0,
+		DD[5][X[a_]] :> (-1)^(n\[Theta]1[a]+n\[Theta]2[a]) X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a]+1,mati[a],matj[a]]]/;n\[Theta]3[a]==0,
+		DD[3][X[a_]] :> 0/;n\[Theta]1[a]==1,
+		DD[4][X[a_]] :> 0/;n\[Theta]2[a]==1,
+		DD[5][X[a_]] :> 0/;n\[Theta]3[a]==1
+	};
+	ApplyDD[{zlis_,expr_}]:=Module[{tmp},tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule];Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule])&,tmp,zlis[[6-r]]],{r,1,5}];tmp];
 ];
 
 Stuff[];
@@ -218,7 +204,7 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,t
 			If[!healthy,
 				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
 				ans = table[
-					ApplyDD[tmp[[i]]]//GExpand
+					ApplyDD[tmp[[i]]]//Expand
 				,
 					{i,1,Length[tmp]}
 				];
