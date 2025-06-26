@@ -124,6 +124,7 @@ On[Assert];
 
 Quiet[<<Combinatorica`];
 $RecursionLimit=Infinity;
+$IterationLimit=Infinity;
 
 If[share, MyShare=Share, MyShare[]:=0];
 
