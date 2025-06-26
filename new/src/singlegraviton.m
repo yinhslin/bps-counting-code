@@ -162,7 +162,7 @@ Stuff[] := Module[{},
 		DD[4][X[a_]] :> 0/;n\[Theta]2[a]==1,
 		DD[5][X[a_]] :> 0/;n\[Theta]3[a]==1
 	};
-	ApplyDD[{zlis_,expr_}]:=Module[{tmp},tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule];Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule])&,tmp,zlis[[6-r]]],{r,1,5}];tmp];
+	ApplyDD[{zlis_,expr_}]:=Module[{tmp},tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand)&,tmp,zlis[[6-r]]],{r,1,5}];tmp];
 ];
 
 Stuff[];
