@@ -164,9 +164,9 @@ Stuff[] := Module[{},
 	};
 	
 	ApplyDD[{zlis_,expr_}]:=Module[{tmp},
-		tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;
+		tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule];
 		Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule])&,tmp,zlis[[6-r]]],{r,1,5}];
-		tmp//Expand
+		tmp//ExpandAll
 	];
 ];
 
@@ -188,7 +188,7 @@ Stuff[];
 	DeleteCases[ans,0]
 ];*)
 
-SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
+(*SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
 	sn = PrepData[singleTraceCharge,degree,NN];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
@@ -210,7 +210,7 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,t
 				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
 				Print["Start ApplyDD", chunk*cnt+1];
 				ans = table[
-					ApplyDD[tmp[[i]]]//Expand
+					ApplyDD[tmp[[i]]]
 				,
 					{i,1,Length[tmp]}
 				];
@@ -238,6 +238,54 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,t
 			Quit[];
 		,*)
 			DeleteFile[#] &/@ FileNames[filename<>"-*"];
+		(*];*)
+	,
+		ans = {};
+	];
+	DeleteCases[ans,0]
+];*)
+
+SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,subfilename,healthy},
+	sn = PrepData[singleTraceCharge,degree,NN];
+	Print["length: ", Length[sn]];
+	If[Length[sn]>0,
+		do[
+			subfilename = filename<>"-"<>ToString[i-1]<>".mx";
+			healthy = True;
+			If[FileExistsQ[subfilename],
+				Check[
+					Get[subfilename];
+					If[!ListQ[singleGraviton[singleTraceCharge,degree,NN]], healthy = False];
+				,
+					healthy = False;
+				];
+			,
+				healthy = False
+			];
+			If[!healthy,
+				singleGraviton[singleTraceCharge,degree,NN] = { ApplyDD[sn[[i]]] };
+				DumpSave[subfilename,singleGraviton];
+			];
+			ClearAll[singleGraviton];
+			,
+			{i,Range[Length[sn]]}
+		];
+		Print["done computing, start collecting"];
+		ans = {};
+		Do[
+			Get[filename<>"-"<>ToString[i-1]<>".mx"];
+			ans = Join[ans,singleGraviton[singleTraceCharge,degree,NN]];
+			ClearAll[singleGraviton];
+		,
+			{i,Range[Length[sn]]}
+		];
+		Assert[Length[ans]==Length[sn]];
+		(*If[Length[ans]=!=Length[sn],
+			Print[ans];
+			Print[Length[ans]];
+			Quit[];
+		,*)
+		(*DeleteFile[#] &/@ FileNames[filename<>"-*"];*)
 		(*];*)
 	,
 		ans = {};
