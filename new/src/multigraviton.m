@@ -20,18 +20,18 @@ Stuff[] := Module[{},
 	matj[a_]:=Mod[a,2^Log2NN]+1;
 
 	If[specialQ&&(!spQ),
-		X[a_] := -Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]/;mati[a]==NN&&matj[a]==NN;
+		X[a_] := (X[a] = - Sum[X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],k,k]],{k,1,NN-1}]) /;mati[a]==NN&&matj[a]==NN;
 	];
 	If[spQ,
-		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2>=matj[a];
-		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]-NN/2]]/;NN/2<mati[a]&&NN/2>=matj[a]&&mati[a]-NN/2>matj[a];
-		X[a_] := X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]-NN/2,mati[a]+NN/2]]/;NN/2>=mati[a]&&NN/2<matj[a]&&mati[a]+NN/2>matj[a];
+		X[a_] := (X[a] = - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]+NN/2]]) /;NN/2>=mati[a]&&NN/2>=matj[a];
+		X[a_] := (X[a] = X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]+NN/2,mati[a]-NN/2]]) /;NN/2<mati[a]&&NN/2>=matj[a]&&mati[a]-NN/2>matj[a];
+		X[a_] := (X[a] = X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a]-NN/2,mati[a]+NN/2]]) /;NN/2>=mati[a]&&NN/2<matj[a]&&mati[a]+NN/2>matj[a];
 	];
 	If[soQ,
-		X[a_] := - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a],mati[a]]]/;mati[a]>matj[a];
-		X[a_] := 0/;mati[a]==matj[a];
+		X[a_] := (X[a] = - X[index[nz1[a],nz2[a],n\[Theta]1[a],n\[Theta]2[a],n\[Theta]3[a],matj[a],mati[a]]]) /;mati[a]>matj[a];
+		X[a_] := (X[a] = 0) /;mati[a]==matj[a];
 	];
-	X[a_]:=0/;nz1[a]==0&&nz2[a]==0&&n\[Theta]1[a]==0&&n\[Theta]2[a]==0&&n\[Theta]3[a]==0;
+	X[a_] := (X[a] = 0) /;nz1[a]==0&&nz2[a]==0&&n\[Theta]1[a]==0&&n\[Theta]2[a]==0&&n\[Theta]3[a]==0;
 
 	Grading[ a_Plus ] := Max @@ (Grading /@ (List @@ a));
 	Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));
