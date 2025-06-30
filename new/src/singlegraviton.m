@@ -285,7 +285,7 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,subfi
 			Print[Length[ans]];
 			Quit[];
 		,*)
-		(*DeleteFile[#] &/@ FileNames[filename<>"-*"];*)
+		DeleteFile[#] &/@ FileNames[filename<>"-*"];
 		(*];*)
 	,
 		ans = {};
