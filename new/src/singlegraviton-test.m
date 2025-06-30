@@ -162,8 +162,12 @@ Stuff[] := Module[{},
 		DD[4][X[a_]] :> 0/;n\[Theta]2[a]==1,
 		DD[5][X[a_]] :> 0/;n\[Theta]3[a]==1
 	};
-	
 	ApplyDD[{zlis_,expr_}]:=Module[{tmp},
+		tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;
+		Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand)&,tmp,zlis[[6-r]]],{r,1,5}];
+		tmp
+	];
+	ApplyDDOrig[{zlis_,expr_}]:=Module[{tmp},
 		tmp=expr//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand;
 		Do[tmp=Nest[(DD[6-r][#]//.DDRules//.Join[NonCommutativeMultiplyRules,GExpandRule])&,tmp,zlis[[6-r]]],{r,1,5}];
 		tmp//Expand
@@ -172,109 +176,14 @@ Stuff[] := Module[{},
 
 Stuff[];
 
-(*SingleGraviton[singleTraceCharge_,degree_,NN_] := Module[{sn,ans},
-	sn = PrepData[singleTraceCharge,degree,NN];
-	Print["length: ", Length[sn]];
-	If[Length[sn]>0,
-		ans = table[
-			ApplyDD[sn[[i]]]//GExpand
-		,
-			{i,1,Length[sn]}
-		];
-		Assert[Length[ans]==Length[sn]];
-	,
-		ans = {};
-	];
-	DeleteCases[ans,0]
-];*)
-
-SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
-	sn = PrepData[singleTraceCharge,degree,NN];
-	Print["length: ", Length[sn]];
-	If[Length[sn]>0,
-		cnt = 0;
-		While[chunk*cnt<Length[sn],
-			subfilename = filename<>"-"<>ToString[cnt]<>".mx";
-			healthy = True;
-			If[FileExistsQ[subfilename],
-				Check[
-					Get[subfilename];
-					If[!ListQ[singleGraviton[singleTraceCharge,degree,NN]], healthy = False];
-				,
-					healthy = False;
-				];
-			,
-				healthy = False
-			];
-			If[!healthy,
-				tmp = sn[[chunk*cnt+1;;Min[chunk*(cnt+1),Length[sn]]]];
-				Print["Start ApplyDD", chunk*cnt+1];
-				ans = table[
-					ApplyDD[tmp[[i]]]//Expand
-				,
-					{i,1,Length[tmp]}
-				];
-				Print["Done ApplyDD"];
-				singleGraviton[singleTraceCharge,degree,NN] = ans;
-				DumpSave[subfilename,singleGraviton];
-			];
-			ClearAll[singleGraviton,ans,tmp];
-			cnt+=1;
-		];
-		Print["done computing, start collecting"];
-		tot = cnt-1;
-		ans = {};
-		Do[
-			Get[filename<>"-"<>ToString[cnt]<>".mx"];
-			ans = Join[ans,singleGraviton[singleTraceCharge,degree,NN]];
-			ClearAll[singleGraviton];
-		,
-			{cnt,0,tot}
-		];
-		Assert[Length[ans]==Length[sn]];
-		(*If[Length[ans]=!=Length[sn],
-			Print[ans];
-			Print[Length[ans]];
-			Quit[];
-		,*)
-			DeleteFile[#] &/@ FileNames[filename<>"-*"];
-		(*];*)
-	,
-		ans = {};
-	];
-	DeleteCases[ans,0]
-];
-
 
 (* ::Section:: *)
 (*Execute*)
 
 
-Exec[] := Module[{},
-	fn = singleGravitonDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"]<>"_"<>ToString[degree]<>"_"<>ToString[NN];
-	filename = fn <> ".mx";
-	If[!FileExistsQ[filename],
-		ClearAll[singleGraviton];
-		TimeConstrained[
-			Check[
-				singleGraviton[charges,degree,NN]=SingleGraviton[charges,degree,NN,fn];
-			,
-				Print["> terminated due to error"];
-				ResetKernels[];
-				Continue[];
-			];
-			DumpSave[filename,singleGraviton];
-			tmp = singleGraviton[charges,degree,NN];
-			ClearAll[singleGraviton];
-			Get[filename];
-			If[tmp =!= singleGraviton[charges,degree,NN],
-				DeleteFile[filename];
-			];
-		,
-			time
-		,
-			Print["> overtime"];
-			ResetKernels[];
-		];
-	];
-];
+filename = singleGravitonDirectory<>"16_1_1_1_1_3_5_6-test.mx";
+Get[filename];
+Print["Testing expanding after each DD"];
+Print[Timing[ApplyDD[test]][[1]]];
+Print["Testing no expanding after each DD"];
+Print[Timing[ApplyDDOrig[test]][[1]]];
