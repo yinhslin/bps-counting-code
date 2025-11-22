@@ -157,7 +157,7 @@ MultiTrace[multiTraceCharge_,degree_,NN_] := Table[Distri[
 		SingleTrace[multiTraceCharge[[i]],deg[[i]],NN]
 	,
 		{i,1,Length[multiTraceCharge]}
-	]] //.GExpandRule//.NonCommutativeMultiplyRules//Expand,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
+	]] //.GExpandRule//.NonCommutativeMultiplyRules//ExpandAll,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
 	
 (*MultiTrace[multiTraceCharge_,degree_,NN_] := Distri[
 	Table[

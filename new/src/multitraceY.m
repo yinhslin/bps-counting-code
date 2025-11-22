@@ -37,7 +37,7 @@ Stuff[] := Module[{},
 	Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ a_NonCommutativeMultiply ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ _ ] := 0;
-	Grading[ a_X ] := Quotient[a[[1]],2^15];
+	Grading[ a_X ] := fp[a[[1]]];
 	GetGradeds[a___] := (*GetGradeds[a] =*) Select[{a}, Grading[#] != 0 &];
 	GetFermions[a___] := (*GetFermions[a] =*) Select[{a}, OddQ[Grading[#]] &];
 
@@ -153,7 +153,7 @@ MultiTrace[multiTraceCharge_,degree_,NN_] := Table[Distri[
 		SingleTrace[multiTraceCharge[[i]],deg[[i]],NN]
 	,
 		{i,1,Length[multiTraceCharge]}
-	]] //.GExpandRule//.NonCommutativeMultiplyRules//Expand,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
+	]] //.GExpandRule//.NonCommutativeMultiplyRules//ExpandAll,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
 	
 AllMultiTrace[degree_,NN_] := Module[{},
 	mtcl = MultiTraceChargeList[charges];

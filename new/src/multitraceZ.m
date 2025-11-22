@@ -4,9 +4,6 @@
 (*Multi Trace*)
 
 
-m = param["m"] // ToExpression;
-
-
 (*Protect[z1,z2,th1,th2,th3,X];*)
 Unprotect[X];
 
@@ -40,7 +37,7 @@ Stuff[] := Module[{},
 	Grading[ a_Times ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ a_NonCommutativeMultiply ] := Plus @@ (Grading /@ (List @@ a));
 	Grading[ _ ] := 0;
-	Grading[ a_X ] := Quotient[a[[1]],2^15];
+	Grading[ a_X ] := fp[a[[1]]];
 	GetGradeds[a___] := (*GetGradeds[a] =*) Select[{a}, Grading[#] != 0 &];
 	GetFermions[a___] := (*GetFermions[a] =*) Select[{a}, OddQ[Grading[#]] &];
 
@@ -156,35 +153,85 @@ MultiTrace[multiTraceCharge_,degree_,NN_] := Table[Distri[
 		SingleTrace[multiTraceCharge[[i]],deg[[i]],NN]
 	,
 		{i,1,Length[multiTraceCharge]}
-	]] //.GExpandRule//.NonCommutativeMultiplyRules//Expand,{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
+	]],{deg,AllDegs[multiTraceCharge,degree]}] // Flatten;
 	
 AllMultiTrace[degree_,NN_] := Module[{},
 	mtcl = MultiTraceChargeList[charges];
-	Print[m,"/",Ceiling[Length[mtcl]/chunk]];
-	subfilename = StringReplace[filename,".mx"->""]<>"-"<>ToString[m]<>".mx";
-	healthy = True;
-	If[FileExistsQ[subfilename],
-		Check[
-			Get[subfilename];
-			If[!ListQ[multiTrace[degree,NN]], healthy = False];
+	(*Print[mtcl];*)
+	Print["length: ", Length[mtcl]];
+	If[Length[mtcl]>0,
+		njobs = Length[mtcl];
+		donelist = {};
+		SetSharedVariable[donelist];
+		do[
+			subfilename = StringReplace[filename,".mx"->""]<>"-"<>ToString[i]<>".mx";
+			healthy = True;
+			If[FileExistsQ[subfilename],
+				If[Quantity[1,"Kibibytes"]<FileSize[subfilename]<Quantity[300,"Kibibytes"],
+					healthy = False;
+					,
+					Check[
+						Get[subfilename];
+						If[!ListQ[multiTrace[degree,NN]], healthy = False];
+					,
+						healthy = False;
+					];
+				];
+				If[!healthy,
+					DeleteFile[subfilename];
+					ClearAll[multiTrace];
+					Print["Bad file: ",i];
+				];
+			,
+				healthy = False
+			];
+			If[!healthy,
+				If[Length[mtcl[[i]]]>1,
+					multiTrace[degree,NN] = MultiTrace[mtcl[[i]],degree,NN];
+					multiTrace[degree,NN] = Table[multi//.Join[NonCommutativeMultiplyRules,GExpandRule]//ExpandAll,{multi,multiTrace[degree,NN]}];
+					,
+					multiTrace[degree,NN] = SingleTrace[mtcl[[i]][[1]],degree,NN];
+				];
+				DumpSave[subfilename,multiTrace];
+				ClearAll[multiTrace];
+			];
+			AppendTo[donelist,i];
+			status = Length[donelist]/njobs;
+			If[Or@@Table[status - j/10 == Min[Abs[Range[njobs]/njobs - j/10]],{j,1,10}],
+				Print[ToString[status*100//N//Round]<>"% finished"];
+			];
 		,
-			healthy = False;
+			{i,1,njobs}
 		];
+		
+		Print["Collecting subfiles ..."];
+		ans = {};
+		Do[
+			subfilename = StringReplace[filename,".mx"->""]<>"-"<>ToString[i]<>".mx";
+			Print[subfilename];
+			healthy = True;
+			If[FileExistsQ[subfilename],
+				Check[
+					Get[subfilename];
+					If[!ListQ[multiTrace[degree,NN]], healthy = False];
+				,
+					healthy = False;
+				];
+			,
+				healthy = False
+			];
+			Assert[healthy];
+			AppendTo[ans,multiTrace[degree,NN]];
+			ClearAll[multiTrace];
+		,
+			{i,1,Length[mtcl]}
+		];
+		Assert[Length[ans]==Length[mtcl]];
+		Print["Combined all results"];
+		ans = Flatten[ans];
 	,
-		healthy = False
+		ans = {}
 	];
-	If[!healthy,
-		tmp = mtcl[[chunk*(m-1)+1;;Min[chunk*m,Length[mtcl]]]];
-		ans = table[
-			Print[i,"/",Length[tmp]];
-			MultiTrace[tmp[[i]],degree,NN]
-		,
-			{i,1,Length[tmp]}
-		];
-		multiTrace[degree,NN] = ans;
-		DumpSave[subfilename,multiTrace];
-	];
-	ClearAll[multiTrace,ans,tmp];
 	DeleteCases[ans,0]
 ];
 
@@ -199,11 +246,25 @@ Exec[] := Module[{},
 		ClearAll[multiTrace];
 		TimeConstrained[
 			Check[
-				AllMultiTrace[degree,NN];
+				multiTrace[charges,degree,NN] = AllMultiTrace[degree,NN];
 			,
 				Print["> terminated due to error"];
 				ResetKernels[];
 				Continue[];
+			];
+			DumpSave[filename,multiTrace];
+			Print["Saved result"];
+			tmp = multiTrace[charges,degree,NN];
+			ClearAll[multiTrace];
+			Get[filename];
+			If[tmp =!= multiTrace[charges,degree,NN],
+				DeleteFile[filename];
+(*			,
+				DeleteFile[#] &/@ Select[FileNames[StringReplace[filename,".mx"->""]<>"-*"],(!(Quantity[1,"Kibibytes"]<FileSize[#]<Quantity[300,"Kibibytes"]))&];
+				dest=multiDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"];
+				files=FileNames[StringReplace[filename,".mx"->""]<>"-*"]; 
+				If[!DirectoryQ[dest],CreateDirectory[dest,CreateIntermediateDirectories->True]];
+				Scan[With[{target=FileNameJoin[{dest,FileNameTake[#]}]},RenameFile[#,target,OverwriteTarget->True]]&,files];*)
 			];
 		,
 			time

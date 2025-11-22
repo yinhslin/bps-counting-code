@@ -180,36 +180,38 @@ Stuff[] := Module[{},
 	CreateWord[singleTrace_,NNN_] := (Table[ X[index[#[[1]],#[[2]],#[[3]],#[[4]],#[[5]],i,j]] ,{i,1,NNN},{j,1,NNN}]) &/@ singleTrace;
 (*	CreateWord[singleTrace_] := (X@@#) &/@ singleTrace;
 	LoadMatrix[NN_] := X[a__]:>Table[XX[EvenQ[{a}[[3]]+{a}[[4]]+{a}[[5]]],a,i,j],{i,1,NN},{j,1,NN}];*)
-	MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace,NN]]//.Join[NonCommutativeMultiplyRules,GExpandRule]//Expand);
+	MonoCharge[singleTrace_,NN_] := (TraceP[CreateWord[singleTrace,NN]]//.Join[NonCommutativeMultiplyRules,GExpandRule]//ExpandAll);
 
 ];
 
 Stuff[];
 
-ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,maxMem_] := Module[{subfilename,healthy,bigmen,statusTask,workinglist},
-	If[FileExistsQ[bigmenfilename],
-		Get[bigmenfilename];
-		bigmen = bigmemsave;
-		,
-		bigmen = {};
+
+SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,njobs,donelist,status,subfilename,healthy,AllDoneQ,ans},
+	sn = SingleNecklaces[singleTraceCharge,degree];
+	Print["length: ", Length[sn]];
+	njobs = Length[sn];
+	If[njobs == 0,
+		Return[{}]
 	];
-	workinglist = {};
-	statusTask = CreateScheduledTask[
-			Print[DateString[],", Memory Available: ",MemoryAvailable[],", Working Kernels: ",Sort[workinglist]];
-			, 
-			3600
-	];
-	StartScheduledTask[statusTask];
-	SetSharedVariable[bigmen,workinglist];
+	donelist = {};
+	SetSharedVariable[donelist];
 	do[
+		(*Print["Starting the "<>ToString[i]<>"-th job"];*)
 		subfilename = filename<>"-"<>ToString[i]<>".mx";
 		healthy = True;
 		If[FileExistsQ[subfilename],
-			Check[
-				Get[subfilename];
-				If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
-			,
+			If[Quantity[10,"Kibibytes"]<FileSize[subfilename]<Quantity[100,"Kibibytes"],
 				healthy = False;
+				,
+				Check[
+					Get[subfilename];
+					If[!ListQ[singleTrace[singleTraceCharge,degree,NN]], healthy = False];
+				,
+					healthy = False;
+				];
+			];
+			If[!healthy,
 				DeleteFile[subfilename];
 				ClearAll[singleTrace];
 				Print["Bad file: ",i];
@@ -218,94 +220,33 @@ ComputeSingleTrace[singleTraceCharge_,degree_,NN_,filename_,bigmenfilename_,sn_,
 			healthy = False
 		];
 		If[!healthy,
-			(*Print[DateString[]<>", Begin: job ", i];*)
-			AppendTo[workinglist,{$KernelID,i}];
-			MemoryConstrained[ 
-				singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
-				(*Print[Now,"finish job: ",i," Memory Available: ",MemoryAvailable[]];*)
-				healthy = True;
-			,
-				maxMem
-			,
-				Print[DateString[Now]," job ",i," failed."," Memory Available: ",MemoryAvailable[]];
-				AppendTo[bigmen,i];
-				bigmemsave = bigmen;
-				DumpSave[bigmenfilename,bigmemsave];
-				healthy = False;
-			];
-			workinglist = DeleteCases[workinglist,{$KernelID,i}];
-			(*Print[DateString[]<>", End: job ", i];*)
-			If[ healthy,
-				DumpSave[subfilename,singleTrace];
-			];
+			singleTrace[singleTraceCharge,degree,NN] = { MonoCharge[sn[[i]],NN] };
+			DumpSave[subfilename,singleTrace];
 		];
-		ClearAll[singleTrace,bigmemsave];
-		ClearAll[CreateWord, fp, GetFermions, GetGradeds, GExpandRule, grade, Grading, index, Log2NN, MonoCharge, NonCommutativeMultiplyRules, nz1, nz2, n\[Theta]1, n\[Theta]2, n\[Theta]3, prod, S, TraceP, X, Xlist];
-		ClearSystemCache[];
-		Share[];
-		Stuff[];
+		ClearAll[singleTrace];
+		AppendTo[donelist,i];
+		status = Length[donelist]/njobs;
+		If[Or@@Table[status - j/10 == Min[Abs[Range[njobs]/njobs - j/10]],{j,1,10}],
+			Print[ToString[status*100//N//Round]<>"% finished"];
+		];
 		,
-		{i,SeedRandom[1];Reverse[RandomSample[Complement[Range[Length[sn]],bigmen]]]}
+		{i,SeedRandom[1];RandomSample[Range[njobs]]}
 	];
-	RemoveScheduledTask[statusTask];
-];
-
-SingleTrace[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,maxMem,statusTask,bigmenfilename,ans},
-	sn = SingleNecklaces[singleTraceCharge,degree];
-	Print["length: ", Length[sn]];
-	If[Length[sn]>0,
-		maxMem = memory * 2^30 ;
-		ParallelEvaluate[$HistoryLength = 0;];
-		(*statusTask = CreateScheduledTask[
-			Print["Memory Available: ",MemoryAvailable[]];
-			If[
-				MemoryAvailable[] < 230 * 10^9
-				,
-				(*Print["Memory Available: ",MemoryAvailable[]];*)
-				Print["Reset Kernels..."];
-				TimeConstrained[
-					CloseKernels[];
-				,
-					60
-				,
-					Print["> cannot close kernels"];
-					Quit[];
-				];
-				Print["> relaunch kernels"];
-				InitiateKernels[];
-				(*ComputeSingleTrace[singleTraceCharge,degree,NN,filename,sn,maxMem];*)
-			];
-			, 
-			60
+	
+	Print["Collecting subfiles ..."];
+	AllDoneQ = And@@Table[subfilename = filename<>"-"<>ToString[i]<>".mx"; FileExistsQ[subfilename],{i,1,njobs}];
+	ans = {};
+	If[AllDoneQ,
+		Do[
+			Get[filename<>"-"<>ToString[i]<>".mx"];
+			ans = Join[ans,singleTrace[singleTraceCharge,degree,NN]];
+			ClearAll[singleTrace];
+			,
+			{i,1,njobs}
 		];
-		StartScheduledTask[statusTask];*)
-		bigmenfilename = filename<>"_bigmen.mx";
-		ComputeSingleTrace[singleTraceCharge,degree,NN,filename,bigmenfilename,sn,maxMem];
-		Print["done"];
-		If[FileExistsQ[bigmenfilename],
-			Get[bigmenfilename];
-		,
-			bigmemsave = {};
-		];
-		ans = {};
-		If[Length[bigmemsave]==0,
-			Do[
-				Get[filename<>"-"<>ToString[i]<>".mx"];
-				ans = Join[ans,singleTrace[singleTraceCharge,degree,NN]];
-				ClearAll[singleTrace];
-				,
-				{i,1,Length[sn]}
-			];
-			(*DeleteFile[#] &/@ FileNames[filename<>"-*"];*)
-		];
-		Assert[Length[ans]==Length[sn]];
-		(*If[Length[ans]=!=Length[sn],
-			Print[ans];
-			Print[Length[ans]];
-		];*)
-	,
-		ans = {};
 	];
+	Assert[Length[ans]==Length[sn]];
+	Print["Combined all results"];
 	DeleteCases[ans,0]
 ];
 
@@ -434,11 +375,18 @@ Exec[] := Module[{},
 				Continue[];
 			];
 			DumpSave[filename,singleTrace];
+			Print["Saved result"];
 			tmp = singleTrace[charges,degree,NN];
 			ClearAll[singleTrace];
 			Get[filename];
 			If[tmp =!= singleTrace[charges,degree,NN],
 				DeleteFile[filename];
+			,
+				DeleteFile[#] &/@ Select[FileNames[fn<>"-*"],(!(Quantity[1,"Kibibytes"]<FileSize[#]<Quantity[300,"Kibibytes"]))&];
+				dest=singleDirectory<>ToString[level]<>"_"<>StringRiffle[ToString[#]&/@charges,"_"];
+				files=FileNames[fn<>"-*"]; 
+				If[!DirectoryQ[dest],CreateDirectory[dest,CreateIntermediateDirectories->True]];
+				Scan[With[{target=FileNameJoin[{dest,FileNameTake[#]}]},RenameFile[#,target,OverwriteTarget->True]]&,files];
 			];
 		,
 			time

@@ -188,7 +188,7 @@ Stuff[];
 	DeleteCases[ans,0]
 ];*)
 
-(*SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
+SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,cnt,tmp,tot,subfilename,healthy},
 	sn = PrepData[singleTraceCharge,degree,NN];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
@@ -243,9 +243,9 @@ Stuff[];
 		ans = {};
 	];
 	DeleteCases[ans,0]
-];*)
+];
 
-SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,subfilename,healthy},
+(*SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,subfilename,healthy},
 	sn = PrepData[singleTraceCharge,degree,NN];
 	Print["length: ", Length[sn]];
 	If[Length[sn]>0,
@@ -291,7 +291,7 @@ SingleGraviton[singleTraceCharge_,degree_,NN_,filename_] := Module[{sn,ans,subfi
 		ans = {};
 	];
 	DeleteCases[ans,0]
-];
+];*)
 
 
 (* ::Section:: *)
