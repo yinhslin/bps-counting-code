@@ -9,3 +9,7 @@ The matching [selected results](https://github.com/yinhslin/bps-counting/tree/25
 The paper release is `2510.24008-v1.0.0`; its combined code/data archive is available from
 the [release page](https://github.com/yinhslin/bps-counting-code/releases/tag/2510.24008-v1.0.0).
 The companion has its own MIT license. Earlier SU(N) code remains in its existing locations.
+
+The combined code and selected data are permanently archived on Zenodo as version 1.0.0:
+[DOI: 10.5281/zenodo.23591262](https://doi.org/10.5281/zenodo.23591262).
+Please cite this version DOI when using this paper's computational companion.
