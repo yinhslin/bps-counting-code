@@ -1,0 +1,106 @@
+[
+  {
+    "group": "so",
+    "N": 7,
+    "charges": [
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    "degree": 2,
+    "mode": "exact",
+    "result": [
+      4,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+      7,
+      1,
+      1
+    ],
+    "matches_supplied_scan": true
+  },
+  {
+    "group": "sp",
+    "N": 6,
+    "charges": [
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    "degree": 2,
+    "mode": "exact",
+    "result": [
+      4,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+      6,
+      1,
+      1
+    ],
+    "matches_supplied_scan": true
+  },
+  {
+    "group": "so",
+    "N": 7,
+    "charges": [
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "degree": 2,
+    "mode": "Float64 Gram/QR",
+    "result": [
+      6,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      7,
+      2,
+      2
+    ],
+    "matches_supplied_scan": true
+  },
+  {
+    "group": "sp",
+    "N": 6,
+    "charges": [
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "degree": 2,
+    "mode": "Float64 Gram/QR",
+    "result": [
+      6,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      6,
+      2,
+      2
+    ],
+    "matches_supplied_scan": true
+  }
+]

@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-23",
+  "wolfram": "14.2.1, MacOSX-ARM64",
+  "julia": "1.10.5",
+  "python": "3.14.6",
+  "small_sector_tests": [
+    {
+      "group": "so",
+      "N": 7,
+      "charges": [
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "degree": 2,
+      "mode": "exact",
+      "result": [
+        4,
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        7,
+        1,
+        1
+      ],
+      "matches_supplied_scan": true
+    },
+    {
+      "group": "sp",
+      "N": 6,
+      "charges": [
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "degree": 2,
+      "mode": "exact",
+      "result": [
+        4,
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        6,
+        1,
+        1
+      ],
+      "matches_supplied_scan": true
+    },
+    {
+      "group": "so",
+      "N": 7,
+      "charges": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "degree": 2,
+      "mode": "Float64 Gram/QR",
+      "result": [
+        6,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        7,
+        2,
+        2
+      ],
+      "matches_supplied_scan": true
+    },
+    {
+      "group": "sp",
+      "N": 6,
+      "charges": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "degree": 2,
+      "mode": "Float64 Gram/QR",
+      "result": [
+        6,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        6,
+        2,
+        2
+      ],
+      "matches_supplied_scan": true
+    }
+  ],
+  "python_tests_passed": 4,
+  "julia_matrix_assertions_passed": 6,
+  "large_L18_recomputed": false,
+  "parallel_mode_tested": false,
+  "missing_input_check": "passed: exits nonzero without writing a count"
+}

@@ -1,0 +1,207 @@
+{
+  "version": "1.0.0",
+  "tag": "2510.24008-v1.0.0",
+  "scope": "code",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 39,
+      "sha256": "16a8537dd688ba6a9793c6373c5d82bb9de63c2eb8c6a9632d5ea7d4571c038d"
+    },
+    {
+      "path": "CITATION.cff",
+      "bytes": 728,
+      "sha256": "d9657230b859ad061feb981f2f6ea11907126a26a791688ba3e8929f11836683"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1098,
+      "sha256": "f371ee69ac154bc695a0c34a7a18ccfef39c4be0e85cb654d9caed229a64203d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6350,
+      "sha256": "1bfbafcf4887ab380da083ca64f915767274ac62d5c994acd08bd16b6bbcaa4e"
+    },
+    {
+      "path": "docs/DATA.md",
+      "bytes": 3943,
+      "sha256": "5b27ca2fad8b1e8e5513e1dd4191fb409e6a7b5a1cccbcf15ba52aabb12add7e"
+    },
+    {
+      "path": "docs/ENVIRONMENT.md",
+      "bytes": 2029,
+      "sha256": "9e526fe1579f7545f6c03c6c5784fac18a9f02e6e78388fc6f8547c7e5137806"
+    },
+    {
+      "path": "docs/NUMERICS.md",
+      "bytes": 2078,
+      "sha256": "c4e1c6440b5771ed3bdfe8ac7ac2330609f0d24af8fa8317850665db705f4a4a"
+    },
+    {
+      "path": "docs/PIPELINE.md",
+      "bytes": 3653,
+      "sha256": "e7515e27f7e035816b2a230039ef954871d60588f4a49e6623935bf194868de8"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "bytes": 3196,
+      "sha256": "ff6b4015d4ff4138bcae712f557848f4b4751053059dec601659582c114fb105"
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "bytes": 2299,
+      "sha256": "533a59a8d7b7e40deea9cb5b3138971940b6d2aa4a900faa0f2b047d3d8d3c56"
+    },
+    {
+      "path": "docs/original_source_manifest.json",
+      "bytes": 9358,
+      "sha256": "c44d5354c20fd6d11f758dc6d033e0a9c11744123f14099f7832518e4ffdda27"
+    },
+    {
+      "path": "docs/source_map.json",
+      "bytes": 3830,
+      "sha256": "8841fe314d0a2a9297ea256b16c2e8c61419d5505059533835db2a13507335e4"
+    },
+    {
+      "path": "docs/test_record.json",
+      "bytes": 1740,
+      "sha256": "96fa08d22ae18ca2cc09891b722370b5e68d7855bce99ff5b15e2186f3af95f2"
+    },
+    {
+      "path": "examples/expected_results.json",
+      "bytes": 1191,
+      "sha256": "30109417185f5fc4a9f666108e0cca9ca04cd4c8bfd67adf9eef6a63792067a5"
+    },
+    {
+      "path": "examples/slurm.sh",
+      "bytes": 726,
+      "sha256": "5a26c21bb312ff5fb829c925caaaf7350efe83008dc858c21780e823edfb9c08"
+    },
+    {
+      "path": "julia/Manifest.toml",
+      "bytes": 8706,
+      "sha256": "41b83ce25186bcad4cd17cc66517328922f5d2c0409038bfebfe41626a4ea1cc"
+    },
+    {
+      "path": "julia/Project.toml",
+      "bytes": 131,
+      "sha256": "881c878d3fc077a55546848a07601399ee300c0127a1b8abc8d2bcc93b4822e8"
+    },
+    {
+      "path": "julia/dotqrC.jl",
+      "bytes": 1925,
+      "sha256": "18642d68d481e037036df4c8b7b6a20b582ffe7bb58ac936ca5df985e2f303d0"
+    },
+    {
+      "path": "julia/qrC.jl",
+      "bytes": 1805,
+      "sha256": "4aee0b77bd4f39d01e1feab006492cea3322965e2012710efb89bc474e239144"
+    },
+    {
+      "path": "tests/test_numerics.jl",
+      "bytes": 1325,
+      "sha256": "af7f229e8f82915b0c7313fb544f3763ceb60ecb268f6bf952f7877806f7fcf3"
+    },
+    {
+      "path": "tests/test_tools.py",
+      "bytes": 1856,
+      "sha256": "b9d045951dabf3fb2a4b0762a88d8b3698c2ae59db2cce30e198542862e3d5b9"
+    },
+    {
+      "path": "tools/export_reduced.wls",
+      "bytes": 1997,
+      "sha256": "38785af6d4b21ea7f4cfdcc59a7797a4a63b8e669c7b0436500e0ac2d68a8a78"
+    },
+    {
+      "path": "tools/run.py",
+      "bytes": 6191,
+      "sha256": "8081929217bad183a125793717db404f6ef5a84a539571f20bbc2fa8e9df9892"
+    },
+    {
+      "path": "tools/split_mtx.py",
+      "bytes": 2314,
+      "sha256": "2d3d00a5fe108352b4bbe3892d084d3b54d03550cf93e79ad13297b7a1a77eae"
+    },
+    {
+      "path": "tools/validate_results.py",
+      "bytes": 8764,
+      "sha256": "a528e21cca2f32853e19b3a6e8cd35195e1661fce1868a8aee8f1b8ed0574ce7"
+    },
+    {
+      "path": "tools/verify_release.py",
+      "bytes": 664,
+      "sha256": "6bff4f721effb150d8b601f761ff5bfd6dab31f79b1bc7c2276244090b415d66"
+    },
+    {
+      "path": "wolfram/cohomologyC.m",
+      "bytes": 2591,
+      "sha256": "c94c55dc696cfdfc02c76e61cb4dae094a25e83613194fa511f71aabf116b8d3"
+    },
+    {
+      "path": "wolfram/countC.m",
+      "bytes": 2216,
+      "sha256": "b5b5159ca35b79cca66bd3d49a50b41bfeb740e5cbc2f241c1ede73fd6ff4304"
+    },
+    {
+      "path": "wolfram/exact.m",
+      "bytes": 6716,
+      "sha256": "614c888d8b80707ca35c36313677751fd4a20256f717bad787987948f10a9e66"
+    },
+    {
+      "path": "wolfram/independentexact.m",
+      "bytes": 4398,
+      "sha256": "58025c979a8566c23f93cf032f6373cdd3a1c20bfecefc447b9c3133a5d196a9"
+    },
+    {
+      "path": "wolfram/independentgraviton.m",
+      "bytes": 4522,
+      "sha256": "8dfe88d85e8e2cc516aed9133d3869e2d2e3391690cb5d2aa181f0299749285f"
+    },
+    {
+      "path": "wolfram/independentoperator.m",
+      "bytes": 3586,
+      "sha256": "1d3a13b9ce2171128d1b7b6326c897058dc2d076ffc5c73c0a969139f7840067"
+    },
+    {
+      "path": "wolfram/multigraviton.m",
+      "bytes": 5687,
+      "sha256": "55be2fa00a208407e6852abb159ec42a8065b076b5835b2385e50a40b6c4ffb4"
+    },
+    {
+      "path": "wolfram/multitrace.m",
+      "bytes": 5353,
+      "sha256": "de4329d6d3f4c5582d5f19500ad1e0b2279b892e3797895fc6b9eb4a1c3b2155"
+    },
+    {
+      "path": "wolfram/numerics.wl",
+      "bytes": 2225,
+      "sha256": "c5d52a80c49afb7d0cb0f65d769b2c21cc7bcc9dd6c144317757fcb6f474bd04"
+    },
+    {
+      "path": "wolfram/reducedexact.m",
+      "bytes": 8758,
+      "sha256": "f671043f7db9eb001ba285e6846be78aa8a10d857e824322831d86935f96480b"
+    },
+    {
+      "path": "wolfram/reducedgrav.m",
+      "bytes": 8847,
+      "sha256": "1d38262c7e82ea674e3fb58d0e24bad139f57debf81747b081d82d0870171e0b"
+    },
+    {
+      "path": "wolfram/run.wls",
+      "bytes": 5306,
+      "sha256": "a05d03989504efea9037f5883f377e26903c1b3a0599425d3eb3a3af9d84683c"
+    },
+    {
+      "path": "wolfram/singlegraviton.m",
+      "bytes": 8649,
+      "sha256": "0c85924b0b3111feb672454e77deb1f75833621e5e952f2400f44f54e5dd43b5"
+    },
+    {
+      "path": "wolfram/singletrace.m",
+      "bytes": 8637,
+      "sha256": "619a3c0f3498c3ecd35104b4ec9d5a337d9287b72313d3995aa94583138eed2e"
+    }
+  ]
+}

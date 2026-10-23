@@ -1,0 +1,78 @@
+{
+  "preserved_original_files": 63,
+  "core_files": [
+    {
+      "original": "singletrace.m",
+      "release": "wolfram/singletrace.m",
+      "original_sha256": "ca9a968beaa5dd37420acabae5cc4233a3ae8b5d8b85d6a03c053e1e2c2dc07b",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "singlegraviton.m",
+      "release": "wolfram/singlegraviton.m",
+      "original_sha256": "7b61141f002c21d6e1077ae06c05bc3b2ce3a51f9df86be4cd86e3ab6ebf1e0d",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "multitrace.m",
+      "release": "wolfram/multitrace.m",
+      "original_sha256": "862cb3f63e18b489a47643e5436fb1176efb8062a0f3f0df78349d2120de8a48",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "multigraviton.m",
+      "release": "wolfram/multigraviton.m",
+      "original_sha256": "952d55c53f6d899fda95f87351f4864b3d413f72c866658903b1075187393034",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "independentoperator.m",
+      "release": "wolfram/independentoperator.m",
+      "original_sha256": "9addd9cfdc67669b63844128b3d16178012162b3347599b84ce4aae2bc540b75",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "exact.m",
+      "release": "wolfram/exact.m",
+      "original_sha256": "24c886b72fd71867323c2f2344a9139027455201ea6d09054b3ca64b9dc6d5c9",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "independentexact.m",
+      "release": "wolfram/independentexact.m",
+      "original_sha256": "c6395b50781fefc96a73cedf5e6dcdd0c93f0b94945d234028e7301b08d08cc1",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "independentgraviton.m",
+      "release": "wolfram/independentgraviton.m",
+      "original_sha256": "bfc87755857cfb56a038884bbc457909f60b5ebcfeb3a2589b21b47e612aeff4",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "reducedgrav.m",
+      "release": "wolfram/reducedgrav.m",
+      "original_sha256": "94a6b04d4b7e6a7da23fd78226e39e98718e6564a673bf00dd241a9c608e5ee9",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "reducedexact.m",
+      "release": "wolfram/reducedexact.m",
+      "original_sha256": "77763896b70c45c9dd9f7f42e081d58379dfb5f1a182b265eb6802d72fdc5f2e",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "cohomologyC.m",
+      "release": "wolfram/cohomologyC.m",
+      "original_sha256": "6f2d6868f234455f881a6da00b27fb8a1755bc4a1b44aeadd0b6dad4c7f84ebc",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    },
+    {
+      "original": "countC.m",
+      "release": "wolfram/countC.m",
+      "original_sha256": "ea3563ab65e90d2219782fae22c5232e244075894cf2e7b9588ec183b1863177",
+      "change": "Remove inactive comments; replace numerical transport where applicable; fail on stage errors."
+    }
+  ],
+  "other_files": "Retained byte-for-byte in the author archive calculation_source_2026-10-23; legacy runners, numerical experiments, check logs and old aggregate CSVs are excluded from this release."
+}

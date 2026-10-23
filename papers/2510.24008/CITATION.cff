@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Please cite this computational companion and the associated paper."
+title: "Computational companion to Violation of S-duality in classical Q-cohomology"
+type: software
+version: "1.0.0"
+date-released: "2026-10-23"
+url: "https://github.com/yinhslin/bps-counting-code/tree/2510.24008-v1.0.0/papers/2510.24008"
+license: MIT
+authors:
+  - family-names: Chang
+    given-names: Chi-Ming
+  - family-names: Lin
+    given-names: Ying-Hsuan
+preferred-citation:
+  type: article
+  title: "Violation of S-duality in classical Q-cohomology"
+  authors:
+    - family-names: Chang
+      given-names: Chi-Ming
+    - family-names: Lin
+      given-names: Ying-Hsuan
+  year: 2025
+  url: "https://arxiv.org/abs/2510.24008"
